@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/bg_light"
+    tools:context=".HomeActivity">
+
+    <!-- Scrollable Main Content -->
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:overScrollMode="never">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <!-- Header Background + Logo -->
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingTop="12dp"
+                android:paddingBottom="12dp">
+
+                <ImageView
+                    android:id="@+id/knife_bg"
+                    android:layout_width="match_parent"
+                    android:layout_height="100dp"
+                    android:src="@drawable/header_bg"
+                    android:scaleType="centerCrop"
+                    android:alpha="0.0" />
+
+                <ImageView
+                    android:id="@+id/logo_leaf"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:layout_centerHorizontal="true"
+                    android:src="@drawable/grass" />
+
+                <TextView
+                    android:id="@+id/app_name"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/logo_leaf"
+                    android:layout_centerHorizontal="true"
+                    android:text="CookMate"
+                    android:textColor="@color/primaryGreen"
+                    android:textSize="20sp"
+                    android:fontFamily="@font/poppins_semibold" />
+            </RelativeLayout>
+
+            <!-- Search Bar -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:background="@drawable/search_bg"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:paddingHorizontal="12dp"
+                android:layout_marginTop="12dp">
+
+                <EditText
+                    android:id="@+id/search_box"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:hint="Search Dishes/Ingredients"
+                    android:textColorHint="@color/textGray"
+                    android:textSize="14sp"
+                    android:background="@android:color/transparent"
+                    android:paddingStart="4dp" />
+
+                <ImageView
+                    android:id="@+id/filter_icon"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:src="@drawable/filter"
+                    android:layout_marginStart="8dp" />
+            </LinearLayout>
+
+            <!-- Recommended Section -->
+            <TextView
+                android:id="@+id/recommended_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Recommended For You"
+                android:textColor="@color/primaryGreen"
+                android:textSize="18sp"
+                android:fontFamily="@font/poppins_bold"
+                android:layout_marginTop="20dp"
+                android:layout_marginStart="4dp" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/primaryGreen"
+                android:layout_marginTop="4dp"
+                android:layout_marginBottom="8dp" />
+
+            <!-- Dish Cards -->
+            <!-- Chicken Handi -->
+            <include layout="@layout/item_dish_card"
+                android:id="@+id/dish_hand" />
+
+            <!-- Chicken Biryani -->
+            <include layout="@layout/item_dish_card"
+                android:id="@+id/dish_biryani" />
+
+            <!-- Palak Paneer -->
+            <include layout="@layout/item_dish_card"
+                android:id="@+id/dish_paneer" />
+
+        </LinearLayout>
+    </ScrollView>
+
+    <!-- Bottom Navigation Bar -->
+    <LinearLayout
+        android:id="@+id/bottom_nav"
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:background="@drawable/nav_bg_gradient"
+        android:orientation="horizontal"
+        android:gravity="center">
+
+        <ImageView
+            android:layout_width="28dp"
+            android:layout_height="28dp"
+            android:src="@drawable/home"
+            android:layout_marginHorizontal="22dp" />
+
+        <ImageView
+            android:layout_width="28dp"
+            android:layout_height="28dp"
+            android:src="@drawable/search"
+            android:layout_marginHorizontal="22dp" />
+
+        <ImageView
+            android:layout_width="34dp"
+            android:layout_height="34dp"
+            android:src="@drawable/add"
+            android:layout_marginHorizontal="22dp" />
+
+        <ImageView
+            android:layout_width="28dp"
+            android:layout_height="28dp"
+            android:src="@drawable/search"
+            android:layout_marginHorizontal="22dp" />
+
+        <ImageView
+            android:layout_width="28dp"
+            android:layout_height="28dp"
+            android:src="@drawable/profile"
+            android:layout_marginHorizontal="22dp" />
+    </LinearLayout>
+</LinearLayout>

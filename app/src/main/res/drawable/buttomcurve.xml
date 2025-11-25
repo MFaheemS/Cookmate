@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="360dp"
+    android:height="200dp"
+    android:viewportWidth="360"
+    android:viewportHeight="200">
+
+    <!-- Left darker green section -->
+    <path
+        android:fillColor="#7ED321"
+        android:pathData="M0,200 L0,100 Q20,90 40,95 Q60,100 80,90 Q100,80 120,95 Q140,110 160,95 Q180,80 180,100 L180,200 Z" />
+
+    <!-- Center lighter green section -->
+    <path
+        android:fillColor="#B8E986"
+        android:pathData="M180,200 L180,100 Q200,80 220,95 Q240,110 260,95 Q280,80 300,90 Q320,100 340,90 Q360,80 360,70 L360,200 Z" />
+
+    <!-- Curved white section -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M0,80 Q60,100 120,85 Q180,70 240,85 Q300,100 360,80 L360,0 L0,0 Z" />
+</vector>

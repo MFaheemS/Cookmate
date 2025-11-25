@@ -1,0 +1,6 @@
+<!-- res/drawable/bg_btn_pill.xml -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <solid android:color="@color/primaryGreen_dark"/>
+    <corners android:radius="20dp"/>
+    <padding android:left="14dp" android:right="14dp"/>
+</shape>

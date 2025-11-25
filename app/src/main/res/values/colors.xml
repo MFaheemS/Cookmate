@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="black">#FF000000</color>
+    <color name="splash_green_light">#4CAF50</color>
+    <color name="splash_green_dark">#388E3C</color>
+    <color name="woody_background">#F5F5DC</color>
+    <color name="lightGreen">#D9F7C4</color>
+    <color name="bg_light">#FAFAFA</color>
+    <color name="textHint">#9AA0A6</color>
+    <color name="borderLight">#E6E6E6</color>
+
+    <color name="primaryGreen_dark">#1F8E4C</color>
+
+
+    <color name="primaryGreen">#2BA135</color>
+    <color name="primaryGreen_light">#8BD08F</color>
+    <color name="white">#FFFFFF</color>
+    <color name="textDark">#222222</color>
+    <color name="textGray">#777777</color>
+    <color name="pink_like">#FF2E83</color>
+</resources>
