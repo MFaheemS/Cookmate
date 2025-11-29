@@ -15,7 +15,7 @@
         android:id="@+id/dish_img"
         android:layout_width="88dp"
         android:layout_height="88dp"
-        android:src="@drawable/Handi"
+        android:src="@drawable/handi"
         android:scaleType="centerCrop"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />

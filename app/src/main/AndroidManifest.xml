@@ -26,11 +26,9 @@
         <activity
             android:name=".forgetscreen"
             android:exported="false" />
+
         <activity
-            android:name=".splashscreen"
-            android:exported="false" />
-        <activity
-            android:name=".MainActivity"
+            android:name=".DownloadsActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
