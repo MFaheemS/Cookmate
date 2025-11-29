@@ -243,7 +243,8 @@
             android:src="@drawable/ic_library"
             android:layout_marginHorizontal="16dp"
             android:layout_weight="1"
-            android:background="@android:color/transparent"/>
+            android:background="@android:color/transparent"
+            app:tint="@color/black"/>
 
         <ImageButton
             android:layout_width="28dp"

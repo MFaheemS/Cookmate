@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="CircularImageView">
+        <item name="shapeAppearanceOverlay">@style/CircularShapeAppearance</item>
+    </style>
+
+    <style name="CircularShapeAppearance">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">50%</item>
+    </style>
+
+    <style name="SwitchTheme" parent="Widget.AppCompat.CompoundButton.Switch">
+        <item name="colorControlActivated">#5B9E4C</item>
+        <item name="colorSwitchThumbNormal">#D9D9D9</item>
+        <item name="android:track">@color/white</item>
+    </style>
+
+</resources>
