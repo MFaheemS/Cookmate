@@ -12,6 +12,24 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.SMDPROJECT">
         <activity
+            android:name=".uploadRecipe"
+            android:exported="false" />
+        <activity
+            android:name=".setTimer"
+            android:exported="false" />
+        <activity
+            android:name=".reminder"
+            android:exported="false" />
+        <activity
+            android:name=".editRecipe"
+            android:exported="false" />
+        <activity
+            android:name=".receipyDetail"
+            android:exported="false" />
+        <activity
+            android:name=".search"
+            android:exported="false" />
+        <activity
             android:name=".followers"
             android:exported="false" />
         <activity
@@ -26,7 +44,6 @@
         <activity
             android:name=".forgetscreen"
             android:exported="false" />
-
         <activity
             android:name=".DownloadsActivity"
             android:exported="true">

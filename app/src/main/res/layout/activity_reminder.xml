@@ -1,0 +1,280 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#FFFFFF">
+
+    <!-- Main Content Area -->
+    <LinearLayout
+        android:id="@+id/content_area"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@id/bottom_navigation"
+        android:orientation="vertical"
+        android:background="@drawable/reminders_border_background"
+        android:layout_margin="12dp">
+
+        <!-- Logo and Title Section -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:padding="16dp"
+            android:gravity="center_vertical">
+
+            <ImageView
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:src="@drawable/grass"
+                android:contentDescription="BookMade Logo" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="CookMade"
+                android:textColor="#7CB342"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:layout_marginLeft="8dp" />
+        </LinearLayout>
+
+        <!-- Reminders Title -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Reminders"
+            android:textColor="#2E7D32"
+            android:textSize="28sp"
+            android:textStyle="bold"
+            android:gravity="center"
+            android:layout_marginBottom="8dp" />
+
+        <!-- Divider Line -->
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="2dp"
+            android:background="#FFC107"
+            android:layout_marginLeft="32dp"
+            android:layout_marginRight="32dp"
+            android:layout_marginBottom="16dp" />
+
+        <!-- ScrollView for Reminder Items -->
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:fillViewport="true">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:paddingLeft="16dp"
+                android:paddingRight="16dp">
+
+                <!-- Reminder Item 1: Chicken Biryani -->
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="16dp">
+
+                    <!-- Recipe Image -->
+                    <ImageView
+                        android:id="@+id/img_biryani"
+                        android:layout_width="80dp"
+                        android:layout_height="80dp"
+                        android:src="@drawable/biryani"
+                        android:scaleType="centerCrop"
+                        android:layout_alignParentLeft="true"
+                        android:contentDescription="Chicken Biryani" />
+
+                    <!-- Info Container -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_toRightOf="@id/img_biryani"
+                        android:layout_toLeftOf="@id/btn_edit_1"
+                        android:layout_marginLeft="12dp"
+                        android:layout_marginRight="12dp"
+                        android:orientation="vertical"
+                        android:layout_centerVertical="true">
+
+                        <!-- Recipe Name and Time -->
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:background="@drawable/reminder_name_background"
+                            android:orientation="vertical"
+                            android:padding="8dp"
+                            android:layout_marginBottom="4dp">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Chicken Biryani"
+                                android:textColor="#FFFFFF"
+                                android:textSize="16sp"
+                                android:textStyle="bold" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="02:00    PM"
+                                android:textColor="#FFFFFF"
+                                android:textSize="14sp"
+                                android:layout_marginTop="4dp" />
+                        </LinearLayout>
+
+                        <!-- Time Left -->
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:background="@drawable/reminder_time_background"
+                            android:padding="8dp"
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical">
+
+                            <ImageView
+                                android:layout_width="16dp"
+                                android:layout_height="16dp"
+                                android:src="@drawable/clock"
+                                android:contentDescription="Clock" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="3 hr left"
+                                android:textColor="#FFFFFF"
+                                android:textSize="14sp"
+                                android:layout_marginLeft="8dp" />
+                        </LinearLayout>
+                    </LinearLayout>
+
+                    <!-- Edit Button -->
+                    <Button
+                        android:id="@+id/btn_edit_1"
+                        android:layout_width="wrap_content"
+                        android:layout_height="36dp"
+                        android:text="Edit"
+                        android:textColor="#FFFFFF"
+                        android:background="@drawable/followbutton"
+                        android:layout_alignParentRight="true"
+                        android:layout_centerVertical="true"
+                        android:paddingLeft="20dp"
+                        android:paddingRight="20dp"
+                        android:textAllCaps="false"
+                        android:backgroundTint="#03A9F4"/>
+                </RelativeLayout>
+
+                <!-- Divider -->
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="#FFC107"
+                    android:layout_marginBottom="16dp" />
+
+
+            </LinearLayout>
+        </ScrollView>
+    </LinearLayout>
+
+
+    <!-- Bottom Navigation -->
+    <LinearLayout
+        android:id="@+id/bottomNavigation"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:background="@drawable/backgroundbutton"
+        android:elevation="8dp"
+        android:orientation="horizontal"
+        android:paddingTop="12dp"
+        android:paddingBottom="12dp"
+        android:weightSum="5">
+
+        <!-- Home -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:clickable="true"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <ImageView
+                android:layout_width="28dp"
+                android:layout_height="28dp"
+                android:src="@drawable/home" />
+
+        </LinearLayout>
+
+        <!-- Search -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:clickable="true"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <ImageView
+                android:layout_width="28dp"
+                android:layout_height="28dp"
+                android:src="@drawable/search" />
+
+        </LinearLayout>
+
+        <!-- Add/Create -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:clickable="true"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <ImageView
+                android:layout_width="28dp"
+                android:layout_height="28dp"
+                android:src="@drawable/add" />
+
+        </LinearLayout>
+
+        <!-- Messages/Documents -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:clickable="true"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <ImageView
+                android:layout_width="28dp"
+                android:layout_height="28dp"
+                android:src="@drawable/ic_library"
+                android:tint="@color/white" />
+
+        </LinearLayout>
+
+        <!-- Profile -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:clickable="true"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <ImageView
+                android:layout_width="28dp"
+                android:layout_height="28dp"
+                android:src="@drawable/profile"
+                android:tint="@color/black" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+
+</RelativeLayout>
