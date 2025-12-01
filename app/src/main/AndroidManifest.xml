@@ -12,6 +12,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.SMDPROJECT">
         <activity
+            android:name=".uploadRecipe"
+            android:exported="false" />
+        <activity
             android:name=".setTimer"
             android:exported="false" />
         <activity
