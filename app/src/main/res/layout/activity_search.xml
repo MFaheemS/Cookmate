@@ -47,7 +47,7 @@
                 android:textColorHint="#999999"
                 android:textColor="#333333"
                 android:background="@android:color/transparent"
-                android:border="none" />
+                />
 
             <ImageView
                 android:layout_width="24dp"

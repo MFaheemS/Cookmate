@@ -2,6 +2,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="#FFFFFF">
 
     <!-- Main Content Area -->
@@ -66,6 +67,7 @@
             android:fillViewport="true">
 
             <LinearLayout
+                android:id="@+id/bottom_navigation"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
@@ -253,7 +255,7 @@
                 android:layout_width="28dp"
                 android:layout_height="28dp"
                 android:src="@drawable/ic_library"
-                android:tint="@color/white" />
+                app:tint="@color/white" />
 
         </LinearLayout>
 
@@ -270,7 +272,7 @@
                 android:layout_width="28dp"
                 android:layout_height="28dp"
                 android:src="@drawable/profile"
-                android:tint="@color/black" />
+                app:tint="@color/black" />
 
         </LinearLayout>
 
