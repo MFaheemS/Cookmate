@@ -137,7 +137,7 @@
                             <ImageView
                                 android:layout_width="16dp"
                                 android:layout_height="16dp"
-                                android:src="@drawable/ic_clock_white"
+                                android:src="@drawable/clock"
                                 android:contentDescription="Clock" />
 
                             <TextView
@@ -162,7 +162,8 @@
                         android:layout_centerVertical="true"
                         android:paddingLeft="20dp"
                         android:paddingRight="20dp"
-                        android:textAllCaps="false" />
+                        android:textAllCaps="false"
+                        android:backgroundTint="#03A9F4"/>
                 </RelativeLayout>
 
                 <!-- Divider -->
