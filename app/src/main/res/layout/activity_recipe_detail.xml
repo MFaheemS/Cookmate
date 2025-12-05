@@ -66,9 +66,11 @@
                         android:layout_marginTop="8dp"
                         android:gravity="center_vertical">
                         <ImageView android:layout_width="20dp" android:layout_height="20dp" android:src="@drawable/hearts" />
-                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="1000" android:textColor="#FFFFFF" android:textSize="14sp" android:layout_marginLeft="4dp" android:layout_marginRight="16dp" />
+                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="" android:textColor="#FFFFFF" android:textSize="14sp" android:layout_marginLeft="4dp" android:layout_marginRight="16dp"
+                            android:id="@+id/favCounter"/>
                         <ImageView android:layout_width="20dp" android:layout_height="20dp" android:src="@drawable/ic_download" />
-                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="325" android:textColor="#FFFFFF" android:textSize="14sp" android:layout_marginLeft="4dp" />
+                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="" android:textColor="#FFFFFF" android:textSize="14sp" android:layout_marginLeft="4dp"
+                            android:id="@+id/downloadCounter"/>
                     </LinearLayout>
                 </LinearLayout>
             </RelativeLayout>

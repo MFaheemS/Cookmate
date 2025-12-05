@@ -26,6 +26,9 @@ class RecipeDetail : AppCompatActivity() {
 
     private lateinit var btnFollow : Button
 
+    private lateinit var txtFavCount : TextView
+    private lateinit var txtDownloadCount : TextView
+
     private var db: UserDatabase? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -43,6 +46,9 @@ class RecipeDetail : AppCompatActivity() {
         stepsContainer = findViewById(R.id.steps_list_container)
         btnBack = findViewById(R.id.btn_back)
         btnFollow = findViewById(R.id.btn_follow)
+
+        txtFavCount = findViewById(R.id.favCounter)
+        txtDownloadCount = findViewById(R.id.downloadCounter)
 
         btnBack.setOnClickListener { finish() }
 
@@ -96,6 +102,13 @@ class RecipeDetail : AppCompatActivity() {
         // 1. Basic Info
         txtTitle.text = data.getString("title")
         txtDesc.text = data.getString("description")
+
+        val favCount = data.getString("favorites_count")
+        val downloadCount = data.getString("downloads_count")
+
+
+        txtFavCount.text = favCount
+        txtDownloadCount.text = downloadCount
 
         if(db != null &&  db!!.getUsername() == data.getString("username")){
             txtUsername.text = "You"
