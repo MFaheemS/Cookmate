@@ -1,8 +1,6 @@
 package com.fast.smdproject
-import com.fast.smdproject.LoginActivity
 
 
-import android.app.Activity
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.ImageDecoder

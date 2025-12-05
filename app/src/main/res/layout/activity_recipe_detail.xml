@@ -111,7 +111,8 @@
                     android:layout_centerVertical="true"
                     android:paddingLeft="24dp"
                     android:paddingRight="24dp"
-                    android:textAllCaps="false" />
+                    android:textAllCaps="false"
+                    app:backgroundTint="@null"/>
             </RelativeLayout>
 
             <!-- Description (Added this so we can see it) -->

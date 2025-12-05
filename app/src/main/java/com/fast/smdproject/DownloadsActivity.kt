@@ -1,6 +1,10 @@
 package com.fast.smdproject
 
+import android.content.Intent
 import android.os.Bundle
+import android.widget.Button
+import android.widget.ImageButton
+import android.widget.ImageView
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
@@ -25,6 +29,26 @@ class DownloadsActivity : AppCompatActivity() {
             insets
         }
 
+        val btnHome = findViewById<ImageButton>(R.id.home)
+        val searchBtn = findViewById<ImageButton>(R.id.search)
+        val btnUpload = findViewById<ImageButton>(R.id.upload)
+        val profileBtn = findViewById<ImageButton>(R.id.profile)
+        val favoriteBtn = findViewById<Button>(R.id.btnFavorites)
+
+
+
+        favoriteBtn.setOnClickListener { startActivity(Intent(this, FavoritesActivity::class.java)) }
+        btnHome.setOnClickListener { startActivity(Intent(this, HomePage::class.java)) }
+        btnUpload.setOnClickListener { startActivity(Intent(this, UploadRecipe::class.java)) }
+        searchBtn.setOnClickListener { startActivity(Intent(this, search::class.java)) }
+        profileBtn.setOnClickListener {
+            startActivity(
+                Intent(
+                    this,
+                    UserProfileActivity::class.java
+                )
+            )
+        }
 
         downloadsList.add(DownloadsModel("Spaghetti Carbonara", "Pasta", "A classic Italian pasta dish made with eggs, cheese, pancetta, and pepper.", null, R.drawable.ic_like_fill, R.drawable.ic_download, R.drawable.ic_timer))
         downloadsList.add(DownloadsModel("Margherita Pizza", "Pizza", "A simple yet delicious pizza topped with fresh tomatoes, mozzarella cheese, and basil.", null, R.drawable.ic_like, R.drawable.ic_downloaded, R.drawable.ic_timer))

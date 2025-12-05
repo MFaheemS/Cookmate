@@ -28,6 +28,14 @@
             android:exported="false" />
 
         <activity
+            android:name=".FavoritesActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".UserProfileActivity"
+            android:exported="false" />
+
+        <activity
             android:name=".setTimer"
             android:exported="false" />
         <activity

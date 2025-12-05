@@ -125,7 +125,7 @@ class RecipeDetail : AppCompatActivity() {
 
         else{
 
-            imgUser.setImageResource(R.drawable.profile)
+            imgUser.setImageResource(R.drawable.default_pfp)
         }
 
         // 4. Populate Tags

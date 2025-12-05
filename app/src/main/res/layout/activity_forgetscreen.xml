@@ -106,7 +106,8 @@
             android:paddingRight="48dp"
             android:paddingTop="14dp"
             android:paddingBottom="14dp"
-            android:elevation="4dp"/>
+            android:elevation="4dp"
+            app:backgroundTint="@null"/>
 
     </LinearLayout>
 

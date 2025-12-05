@@ -106,6 +106,7 @@
         app:layout_constraintEnd_toEndOf="parent">
 
         <ImageButton
+            android:id="@+id/home"
             android:layout_width="28dp"
             android:layout_height="28dp"
             android:src="@drawable/ic_home"
@@ -114,6 +115,7 @@
             android:background="@android:color/transparent"/>
 
         <ImageButton
+            android:id="@+id/search"
             android:layout_width="28dp"
             android:layout_height="28dp"
             android:src="@drawable/ic_search"
@@ -122,6 +124,7 @@
             android:background="@android:color/transparent"/>
 
         <ImageButton
+            android:id="@+id/upload"
             android:layout_width="28dp"
             android:layout_height="28dp"
             android:src="@drawable/ic_upload"
@@ -139,6 +142,7 @@
             app:tint="@color/black"/>
 
         <ImageButton
+            android:id="@+id/profile"
             android:layout_width="28dp"
             android:layout_height="28dp"
             android:src="@drawable/ic_profile"

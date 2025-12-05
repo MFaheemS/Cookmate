@@ -223,7 +223,8 @@
                 android:textStyle="bold"
                 app:cornerRadius="12dp"
                 app:strokeColor="#D32F2F"
-                app:strokeWidth="2dp" />
+                app:strokeWidth="2dp"
+                app:backgroundTint="@null"/>
 
         </LinearLayout>
     </com.google.android.material.card.MaterialCardView>

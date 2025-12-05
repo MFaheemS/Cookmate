@@ -11,12 +11,23 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="2"
-        android:hint="Ingredient (e.g. Rice)" />
+        android:hint="Ingredient (e.g. Rice)"
+        android:textColor="#333333"
+        android:textColorHint="#999999"
+        android:textSize="14sp"
+        android:background="@android:color/transparent"
+        android:padding="8dp"/>
 
     <EditText
         android:id="@+id/row_ing_qty"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"
-        android:hint="Qty" />
+        android:hint="Qty"
+        android:textColor="#666666"
+        android:textColorHint="#999999"
+        android:textSize="14sp"
+        android:gravity="right"
+        android:background="@android:color/transparent"
+        android:padding="8dp" />
 </LinearLayout>

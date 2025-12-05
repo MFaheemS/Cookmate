@@ -316,7 +316,8 @@
                     android:layout_gravity="right"
                     android:paddingLeft="24dp"
                     android:paddingRight="24dp"
-                    android:textAllCaps="false" />
+                    android:textAllCaps="false"
+                    app:backgroundTint="@null"/>
             </LinearLayout>
 
             <!-- Add Ingredients Section -->
@@ -400,7 +401,8 @@
                     android:layout_gravity="right"
                     android:paddingLeft="24dp"
                     android:paddingRight="24dp"
-                    android:textAllCaps="false" />
+                    android:textAllCaps="false"
+                    app:backgroundTint="@null"/>
             </LinearLayout>
 
             <!-- Add Steps Section -->
@@ -443,7 +445,8 @@
                     android:layout_gravity="right"
                     android:paddingLeft="24dp"
                     android:paddingRight="24dp"
-                    android:textAllCaps="false" />
+                    android:textAllCaps="false"
+                    app:backgroundTint="@null"/>
             </LinearLayout>
 
             <!-- Add Tags Section -->
@@ -485,7 +488,8 @@
                 android:layout_gravity="right"
                 android:paddingLeft="24dp"
                 android:paddingRight="24dp"
-                android:textAllCaps="false" />
+                android:textAllCaps="false"
+                app:backgroundTint="@null"/>
 
         </LinearLayout>
     </ScrollView>

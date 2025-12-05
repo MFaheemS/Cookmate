@@ -88,7 +88,8 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:gravity="center">
-            <ImageView android:layout_width="28dp" android:layout_height="28dp" android:src="@drawable/home" />
+            <ImageView android:layout_width="28dp" android:layout_height="28dp" android:src="@drawable/home"
+                android:id="@+id/home"/>
         </LinearLayout>
 
         <LinearLayout
@@ -96,7 +97,8 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:gravity="center">
-            <ImageView android:layout_width="28dp" android:layout_height="28dp" android:src="@drawable/search" />
+            <ImageView android:layout_width="28dp" android:layout_height="28dp" android:src="@drawable/search"
+                app:tint="@color/black"/>
         </LinearLayout>
 
         <LinearLayout
@@ -104,7 +106,8 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:gravity="center">
-            <ImageView android:layout_width="28dp" android:layout_height="28dp" android:src="@drawable/add" />
+            <ImageView android:layout_width="28dp" android:layout_height="28dp" android:src="@drawable/add"
+                android:id="@+id/upload"/>
         </LinearLayout>
 
         <LinearLayout
@@ -112,7 +115,8 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:gravity="center">
-            <ImageView android:layout_width="28dp" android:layout_height="28dp" android:src="@drawable/ic_library" />
+            <ImageView android:layout_width="28dp" android:layout_height="28dp" android:src="@drawable/ic_library"
+                android:id="@+id/lib"/>
         </LinearLayout>
 
         <LinearLayout
@@ -120,7 +124,8 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:gravity="center">
-            <ImageView android:layout_width="28dp" android:layout_height="28dp" android:src="@drawable/profile" app:tint="@color/white" />
+            <ImageView android:layout_width="28dp" android:layout_height="28dp" android:src="@drawable/profile" app:tint="@color/white"
+                android:id="@+id/profile"/>
         </LinearLayout>
     </LinearLayout>
 

@@ -1,5 +1,6 @@
 package com.fast.smdproject
 
+import android.content.Context
 import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Bundle
@@ -117,12 +118,16 @@ class UploadRecipe : AppCompatActivity() {
 
         // 1. Get Username (User Safety Check)
         val db = UserDatabase(this)
-        val currentUsername = db.getUsername()
+        val currentUsername = db.getUsername() ?: return
+        val uniqueId = UUID.randomUUID().toString()
+        val imageBase64 = if (selectedImageBitmap != null) bitmapToBase64(selectedImageBitmap!!) else ""
 
-        if (currentUsername == null) {
+        if (currentUsername.isNullOrEmpty()) {
             Toast.makeText(this, "User not logged in!", Toast.LENGTH_SHORT).show()
             return
         }
+
+
 
         val ipAddress = getString(R.string.ipAddress)
         val url = "http://$ipAddress/cookMate/uploadRecipe.php"
@@ -166,60 +171,96 @@ class UploadRecipe : AppCompatActivity() {
         val finalIngredientsJson = ingredientsArray.toString()
         val finalStepsJson = stepsArray.toString()
 
-        val request = object : StringRequest(
-            Request.Method.POST, url,
-            { response ->
-                try {
-                    val json = JSONObject(response)
-                    if (json.getString("status") == "success") {
-                        Toast.makeText(this, "Upload Successful!", Toast.LENGTH_LONG).show()
-                        finish()
-                    } else {
-                        Toast.makeText(this, json.getString("message"), Toast.LENGTH_LONG).show()
+        if(isNetworkAvailable()){
+
+            val request = object : StringRequest(
+                Request.Method.POST, url,
+                { response ->
+                    try {
+                        val json = JSONObject(response)
+                        if (json.getString("status") == "success") {
+                            Toast.makeText(this, "Upload Successful!", Toast.LENGTH_LONG).show()
+                            finish()
+                        } else {
+                            Toast.makeText(this, json.getString("message"), Toast.LENGTH_LONG).show()
+                        }
+                    } catch (e: Exception) {
+                        Toast.makeText(this, "JSON Error: ${e.message}", Toast.LENGTH_SHORT).show()
                     }
-                } catch (e: Exception) {
-                    Toast.makeText(this, "JSON Error: ${e.message}", Toast.LENGTH_SHORT).show()
+                },
+                { error ->
+                    Toast.makeText(this, "Network Error: ${error.message}", Toast.LENGTH_SHORT).show()
                 }
-            },
-            { error ->
-                Toast.makeText(this, "Network Error: ${error.message}", Toast.LENGTH_SHORT).show()
-            }
-        ) {
-            override fun getParams(): MutableMap<String, String> {
-                val params = HashMap<String, String>()
-                params["username"] = currentUsername
-                params["unique_id"] = UUID.randomUUID().toString()
-                params["title"] = title
-                params["tags"] = tags
+            ) {
+                override fun getParams(): MutableMap<String, String> {
+                    val params = HashMap<String, String>()
+                    params["username"] = currentUsername
+                    params["unique_id"] = UUID.randomUUID().toString()
+                    params["title"] = title
+                    params["tags"] = tags
 
-                // Use the safe strings we created above
-                params["ingredients"] = finalIngredientsJson
-                params["steps"] = finalStepsJson
-                params["description"] = desc
+                    // Use the safe strings we created above
+                    params["ingredients"] = finalIngredientsJson
+                    params["steps"] = finalStepsJson
+                    params["description"] = desc
 
-                if (selectedImageBitmap != null) {
-                    params["image"] = bitmapToBase64(selectedImageBitmap!!)
+                    if (selectedImageBitmap != null) {
+                        params["image"] = bitmapToBase64(selectedImageBitmap!!)
+                    }
+
+                    return params
                 }
-
-                return params
             }
+
+            request.retryPolicy = DefaultRetryPolicy(
+                15000,
+                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT
+            )
+
+            Volley.newRequestQueue(this).add(request)
         }
 
-        request.retryPolicy = DefaultRetryPolicy(
-            15000,
-            DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
-            DefaultRetryPolicy.DEFAULT_BACKOFF_MULT
-        )
+        else{
 
-        Volley.newRequestQueue(this).add(request)
+            db.savePendingRecipe(
+                uniqueId, currentUsername, title, desc,
+                finalIngredientsJson, finalStepsJson, tags, imageBase64
+            )
+
+            Toast.makeText(this, "No Internet. Saved to Uploads! Will upload automatically.", Toast.LENGTH_LONG).show()
+
+
+            scheduleUploadWorker()
+
+            finish()
+        }
     }
 
     // Helper: Bitmap -> Base64 String
     private fun bitmapToBase64(bitmap: Bitmap): String {
         val stream = ByteArrayOutputStream()
-        // Compress to 70% quality to avoid "Body too large" errors
+
         bitmap.compress(Bitmap.CompressFormat.JPEG, 70, stream)
         val bytes = stream.toByteArray()
         return Base64.encodeToString(bytes, Base64.DEFAULT)
+    }
+
+    private fun isNetworkAvailable(): Boolean {
+        val connectivityManager = getSystemService(Context.CONNECTIVITY_SERVICE) as android.net.ConnectivityManager
+        val activeNetworkInfo = connectivityManager.activeNetworkInfo
+        return activeNetworkInfo != null && activeNetworkInfo.isConnected
+    }
+
+    private fun scheduleUploadWorker() {
+        val uploadWorkRequest = androidx.work.OneTimeWorkRequestBuilder<UploadWorker>()
+            .setConstraints(
+                androidx.work.Constraints.Builder()
+                    .setRequiredNetworkType(androidx.work.NetworkType.CONNECTED)
+                    .build()
+            )
+            .build()
+
+        androidx.work.WorkManager.getInstance(this).enqueue(uploadWorkRequest)
     }
 }

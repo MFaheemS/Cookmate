@@ -184,7 +184,8 @@
                     android:layout_gravity="end"
                     android:paddingLeft="24dp"
                     android:paddingRight="24dp"
-                    android:textAllCaps="false" />
+                    android:textAllCaps="false"
+                    app:backgroundTint="@null"/>
             </LinearLayout>
 
             <LinearLayout
@@ -298,7 +299,8 @@
                 android:background="@drawable/followbutton"
                 android:textSize="16sp"
                 android:textStyle="bold"
-                android:layout_marginBottom="24dp" />
+                android:layout_marginBottom="24dp"
+                app:backgroundTint="@null"/>
 
         </LinearLayout>
     </ScrollView>

@@ -27,7 +27,8 @@ class HomePage : AppCompatActivity() {
         val btnSearch = findViewById<ImageView>(R.id.search)
         val btnUpload = findViewById<ImageView>(R.id.upload)
         val searchBar = findViewById<EditText>(R.id.search_bar)
-        // ... (other buttons)
+        val libBtn = findViewById<ImageView>(R.id.lib)
+        val profileBtn = findViewById<ImageView>(R.id.profile)
 
         searchBar.setOnClickListener {
 
@@ -37,6 +38,8 @@ class HomePage : AppCompatActivity() {
 
         btnSearch.setOnClickListener { startActivity(Intent(this, search::class.java)) }
         btnUpload.setOnClickListener { startActivity(Intent(this, UploadRecipe::class.java)) }
+        libBtn.setOnClickListener { startActivity(Intent(this, DownloadsActivity::class.java)) }
+        profileBtn.setOnClickListener { startActivity(Intent(this, UserProfileActivity::class.java)) }
 
         // RecyclerView Setup
         recyclerView = findViewById(R.id.recycler_view_recipes)

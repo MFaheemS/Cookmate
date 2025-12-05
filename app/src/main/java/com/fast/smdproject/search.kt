@@ -1,5 +1,6 @@
 package com.fast.smdproject
 
+import android.content.Intent
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -25,6 +26,20 @@ class search : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_search)
+
+
+        val btnHome = findViewById<ImageView>(R.id.home)
+        val btnUpload = findViewById<ImageView>(R.id.upload)
+        val libBtn = findViewById<ImageView>(R.id.lib)
+        val profileBtn = findViewById<ImageView>(R.id.profile)
+
+
+
+        btnHome.setOnClickListener { startActivity(Intent(this, HomePage::class.java)) }
+        btnUpload.setOnClickListener { startActivity(Intent(this, UploadRecipe::class.java)) }
+        libBtn.setOnClickListener { startActivity(Intent(this, DownloadsActivity::class.java)) }
+        profileBtn.setOnClickListener { startActivity(Intent(this, UserProfileActivity::class.java)) }
+
 
 
         searchInput = findViewById(R.id.search_input)
