@@ -37,7 +37,7 @@
             android:name=".editRecipe"
             android:exported="false" />
         <activity
-            android:name=".receipyDetail"
+            android:name=".RecipeDetail"
             android:exported="false" />
         <activity
             android:name=".search"

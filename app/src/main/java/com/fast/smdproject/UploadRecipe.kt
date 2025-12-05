@@ -37,6 +37,8 @@ class UploadRecipe : AppCompatActivity() {
     // Data Variables
     private var selectedImageBitmap: Bitmap? = null
 
+    private lateinit var description: EditText
+
     // Image Picker
     private val pickImageLauncher = registerForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
         if (uri != null) {
@@ -67,6 +69,8 @@ class UploadRecipe : AppCompatActivity() {
         imgRecipePreview = findViewById(R.id.img_recipe_preview)
         txtTapHint = findViewById(R.id.txt_tap_hint)
         btnRemoveImage = findViewById(R.id.btn_remove_image)
+
+        description = findViewById(R.id.description)
 
         // Listeners
         btnBack.setOnClickListener { finish() }
@@ -109,6 +113,7 @@ class UploadRecipe : AppCompatActivity() {
     private fun uploadRecipeToBackend() {
         val title = etTitle.text.toString().trim()
         val tags = etTags.text.toString().trim()
+        val desc = description.text.toString().trim()
 
         // 1. Get Username (User Safety Check)
         val db = UserDatabase(this)
@@ -190,6 +195,7 @@ class UploadRecipe : AppCompatActivity() {
                 // Use the safe strings we created above
                 params["ingredients"] = finalIngredientsJson
                 params["steps"] = finalStepsJson
+                params["description"] = desc
 
                 if (selectedImageBitmap != null) {
                     params["image"] = bitmapToBase64(selectedImageBitmap!!)

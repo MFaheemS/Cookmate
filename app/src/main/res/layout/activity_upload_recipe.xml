@@ -242,6 +242,41 @@
                     android:layout_height="wrap_content"
                     android:hint="#Lunch, #Spicy"
                     android:textColor="#333333"
+                    android:textColorHint="#999999"
+                    android:textSize="14sp"
+                    android:background="@android:color/transparent"
+                    android:paddingBottom="8dp"
+                    android:layout_marginBottom="4dp" />
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="#E0E0E0"
+                    android:layout_marginBottom="16dp" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginBottom="16dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Description"
+                    android:textColor="#333333"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    android:layout_marginBottom="12dp" />
+
+                <EditText
+                    android:id="@+id/description"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Enter Description"
+                    android:textColor="#333333"
+                    android:textColorHint="#999999"
                     android:textSize="14sp"
                     android:background="@android:color/transparent"
                     android:paddingBottom="8dp"
