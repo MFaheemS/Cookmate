@@ -29,6 +29,7 @@ class signup : AppCompatActivity() {
     private lateinit var imgProfile: ImageView
 
     private var encodedImage: String? = null
+    private lateinit var etPasswordConfirm: EditText
 
     private lateinit var login: TextView
 
@@ -61,6 +62,7 @@ class signup : AppCompatActivity() {
         etPassword = findViewById(R.id.passwordInput)
         btnSignup = findViewById(R.id.createButton)
         imgProfile = findViewById(R.id.profileImage)
+        etPasswordConfirm = findViewById(R.id.confirmPasswordInput)
 
         login = findViewById<TextView>(R.id.loginText)
 
@@ -98,6 +100,12 @@ class signup : AppCompatActivity() {
         val lastName = etLastName.text.toString().trim()
         val email = etEmail.text.toString().trim()
         val password = etPassword.text.toString().trim()
+        val passwordConfirm = etPasswordConfirm.text.toString().trim()
+
+        if(password != passwordConfirm){
+            Toast.makeText(this, "Passwords do not match.", Toast.LENGTH_SHORT).show()
+            return
+        }
 
 
         if (username.isEmpty() || firstName.isEmpty() || lastName.isEmpty() ||

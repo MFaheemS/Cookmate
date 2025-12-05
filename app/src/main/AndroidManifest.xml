@@ -36,6 +36,14 @@
             android:exported="false" />
 
         <activity
+            android:name=".EditUserProfileActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".SettingsActivity"
+            android:exported="false" />
+
+        <activity
             android:name=".setTimer"
             android:exported="false" />
         <activity

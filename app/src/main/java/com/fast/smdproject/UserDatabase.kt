@@ -129,4 +129,51 @@ class UserDatabase(context: Context) :
         db.delete("pending_recipes", "id=?", arrayOf(id))
         db.close()
     }
+
+
+    fun getUserDetails(): HashMap<String, String> {
+        val db = readableDatabase
+
+        val cursor = db.rawQuery("SELECT username, email, first_name, last_name, profile_image FROM user LIMIT 1", null)
+
+        val userMap = HashMap<String, String>()
+
+        if (cursor.moveToFirst()) {
+            userMap["username"] = cursor.getString(cursor.getColumnIndexOrThrow("username"))
+            userMap["email"] = cursor.getString(cursor.getColumnIndexOrThrow("email"))
+            userMap["first_name"] = cursor.getString(cursor.getColumnIndexOrThrow("first_name"))
+            userMap["last_name"] = cursor.getString(cursor.getColumnIndexOrThrow("last_name"))
+
+
+            val img = cursor.getString(cursor.getColumnIndexOrThrow("profile_image"))
+            userMap["profile_image"] = img ?: ""
+        }
+
+        cursor.close()
+        db.close()
+        return userMap
+    }
+
+
+    fun updateLocalProfile(newUsername: String?, newEmail: String?, newImage: String?) {
+        val db = writableDatabase
+        val values = ContentValues()
+
+
+        if (!newUsername.isNullOrEmpty()) values.put("username", newUsername)
+        if (!newEmail.isNullOrEmpty()) values.put("email", newEmail)
+        if (!newImage.isNullOrEmpty()) values.put("profile_image", newImage)
+
+
+        db.update("user", values, null, null)
+        db.close()
+    }
+
+
+    fun logout() {
+        val db = writableDatabase
+
+        db.execSQL("DELETE FROM user")
+        db.close()
+    }
 }

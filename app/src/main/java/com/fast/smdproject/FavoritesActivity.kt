@@ -12,9 +12,7 @@ import androidx.core.view.WindowInsetsCompat
 
 class FavoritesActivity : AppCompatActivity() {
 
-    var recyclerView: androidx.recyclerview.widget.RecyclerView? = null
-    var downloadsAdapter: DownloadsAdapter? = null
-    var downloadsList = ArrayList<DownloadsModel>()
+
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
