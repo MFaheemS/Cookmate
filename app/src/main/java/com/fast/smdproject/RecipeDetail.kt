@@ -1,6 +1,7 @@
 package com.fast.smdproject
 
 import android.os.Bundle
+import android.view.View
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import com.android.volley.Request
@@ -23,6 +24,10 @@ class RecipeDetail : AppCompatActivity() {
     private lateinit var stepsContainer: LinearLayout
     private lateinit var btnBack: ImageView
 
+    private lateinit var btnFollow : Button
+
+    private var db: UserDatabase? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_recipe_detail)
@@ -37,10 +42,13 @@ class RecipeDetail : AppCompatActivity() {
         ingredientsContainer = findViewById(R.id.ingredients_list_container)
         stepsContainer = findViewById(R.id.steps_list_container)
         btnBack = findViewById(R.id.btn_back)
+        btnFollow = findViewById(R.id.btn_follow)
 
         btnBack.setOnClickListener { finish() }
 
-        // Get ID passed from Home Page
+        db = UserDatabase(this)
+
+
         val recipeId = intent.getIntExtra("RECIPE_ID", -1)
 
         if (recipeId != -1) {
@@ -88,22 +96,36 @@ class RecipeDetail : AppCompatActivity() {
         // 1. Basic Info
         txtTitle.text = data.getString("title")
         txtDesc.text = data.getString("description")
-        txtUsername.text = data.getString("username")
+
+        if(db != null &&  db!!.getUsername() == data.getString("username")){
+            txtUsername.text = "You"
+            btnFollow.visibility = View.GONE
+        }
+
+        else{
+            txtUsername.text = data.getString("username")
+            btnFollow.visibility = View.VISIBLE
+        }
 
         // 2. Load Hero Image
         val imagePath = data.getString("images")
-        if (imagePath.isNotEmpty()) {
+        if (!imagePath.isNullOrEmpty()) {
             val fullUrl = "http://$ipAddress/cookMate/$imagePath"
             Glide.with(this).load(fullUrl).into(imgRecipe)
         }
 
-        // 3. Load User Profile Image (Optional if you have it)
+
         val userImg = data.getString("profile_image")
-        if (userImg.isNotEmpty()) {
-            // Check if it's base64 or url. Assuming URL path for consistency, or Base64 string directly
-            // If you saved base64 string in DB for user profile, decode it.
-            // For now, let's assume it's a placeholder or similar logic.
-            Glide.with(this).load(R.drawable.profile).into(imgUser) // Placeholder
+        if (!userImg.isNullOrEmpty()) {
+
+            val fullUrl = "http://$ipAddress/cookMate/$userImg"
+
+            Glide.with(this).load(fullUrl).into(imgUser)
+        }
+
+        else{
+
+            imgUser.setImageResource(R.drawable.profile)
         }
 
         // 4. Populate Tags

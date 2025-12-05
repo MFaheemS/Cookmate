@@ -84,8 +84,8 @@
                     android:id="@+id/user_avatar"
                     android:layout_width="48dp"
                     android:layout_height="48dp"
-                    android:src="@drawable/profile"
-                    app:tint="#888888"
+                    android:src="@drawable/default_pfp"
+
                     android:layout_alignParentLeft="true" />
 
                 <TextView

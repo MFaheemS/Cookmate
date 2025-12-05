@@ -2,6 +2,7 @@ package com.fast.smdproject
 
 import android.content.Intent
 import android.os.Bundle
+import android.widget.EditText
 import android.widget.ImageView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -25,7 +26,14 @@ class HomePage : AppCompatActivity() {
         // Bottom Nav Setup
         val btnSearch = findViewById<ImageView>(R.id.search)
         val btnUpload = findViewById<ImageView>(R.id.upload)
+        val searchBar = findViewById<EditText>(R.id.search_bar)
         // ... (other buttons)
+
+        searchBar.setOnClickListener {
+
+            val intent = Intent(this, search::class.java)
+            startActivity(intent)
+        }
 
         btnSearch.setOnClickListener { startActivity(Intent(this, search::class.java)) }
         btnUpload.setOnClickListener { startActivity(Intent(this, UploadRecipe::class.java)) }

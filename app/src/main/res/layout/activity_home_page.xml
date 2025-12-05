@@ -46,7 +46,9 @@
             android:paddingLeft="16dp"
             android:paddingRight="80dp"
             android:textSize="14sp"
-            android:textColorHint="#999999" />
+            android:textColorHint="#999999"
+            android:clickable="true"
+            android:focusable="true"/>
     </RelativeLayout>
 
     <androidx.recyclerview.widget.RecyclerView
