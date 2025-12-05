@@ -1,6 +1,7 @@
 package com.fast.smdproject
 
 import android.os.Bundle
+import android.widget.ImageView
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
@@ -16,5 +17,23 @@ class HomePage : AppCompatActivity() {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
+
+        val btnSearch = findViewById<ImageView>(R.id.search)
+        val btnUpload = findViewById<ImageView>(R.id.upload)
+        val btnLib = findViewById<ImageView>(R.id.lib)
+        val btnProfile = findViewById<ImageView>(R.id.profile)
+
+        btnSearch.setOnClickListener {
+
+            val intent = android.content.Intent(this, search::class.java)
+            startActivity(intent)
+        }
+
+        btnUpload.setOnClickListener {
+
+            val intent = android.content.Intent(this, UploadRecipe::class.java)
+            startActivity(intent)
+        }
+
     }
 }

@@ -235,7 +235,10 @@
             <ImageView
                 android:layout_width="28dp"
                 android:layout_height="28dp"
-                android:src="@drawable/home" />
+                android:src="@drawable/home"
+                app:tint="@color/black"
+                android:clickable="true"
+                android:focusable="true"/>
 
         </LinearLayout>
 
@@ -249,9 +252,12 @@
             android:clickable="true">
 
             <ImageView
+                android:id="@+id/search"
                 android:layout_width="28dp"
                 android:layout_height="28dp"
-                android:src="@drawable/search" />
+                android:src="@drawable/search"
+                android:clickable="true"
+                android:focusable="true"/>
 
         </LinearLayout>
 
@@ -265,9 +271,12 @@
             android:clickable="true">
 
             <ImageView
+                android:id="@+id/upload"
                 android:layout_width="28dp"
                 android:layout_height="28dp"
-                android:src="@drawable/add" />
+                android:src="@drawable/add"
+                android:clickable="true"
+                android:focusable="true"/>
 
         </LinearLayout>
 
@@ -281,10 +290,12 @@
             android:clickable="true">
 
             <ImageView
+                android:id="@+id/lib"
                 android:layout_width="28dp"
                 android:layout_height="28dp"
                 android:src="@drawable/ic_library"
-                />
+                android:clickable="true"
+                android:focusable="true"/>
 
         </LinearLayout>
 
@@ -298,10 +309,13 @@
             android:clickable="true">
 
             <ImageView
+                android:id="@+id/profile"
                 android:layout_width="28dp"
                 android:layout_height="28dp"
                 android:src="@drawable/profile"
-                app:tint="@color/black"/>
+                app:tint="@color/white"
+                android:clickable="true"
+                android:focusable="true"/>
 
         </LinearLayout>
 

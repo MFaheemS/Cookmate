@@ -46,4 +46,20 @@ class UserDatabase(context: Context) :
         db.close()
         return loggedIn
     }
+
+    // Add this to UserDatabase.kt
+    fun getUsername(): String? {
+        val db = readableDatabase
+        val cursor = db.rawQuery("SELECT username FROM user LIMIT 1", null)
+
+        var username: String? = null
+        if (cursor.moveToFirst()) {
+            // Column index 0 because we only selected 'username'
+            username = cursor.getString(0)
+        }
+
+        cursor.close()
+        db.close()
+        return username
+    }
 }

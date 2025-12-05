@@ -20,7 +20,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.SMDPROJECT">
         <activity
-            android:name=".uploadRecipe"
+            android:name=".UploadRecipe"
             android:exported="false" />
 
         <activity
