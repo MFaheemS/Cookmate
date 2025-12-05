@@ -2,6 +2,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="#FFFFFF"
     android:id="@+id/recipe_detail">
 
@@ -20,33 +21,27 @@
                 android:layout_width="match_parent"
                 android:layout_height="280dp">
 
-                <!-- Background Image -->
                 <ImageView
                     android:id="@+id/recipe_image"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:src="@drawable/biryani"
-                    android:scaleType="centerCrop"
-                    android:contentDescription="Chicken Biryani" />
+                    android:scaleType="centerCrop" />
 
-                <!-- Dark Overlay for text readability -->
                 <View
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:background="#60000000" />
 
-                <!-- Back Button -->
                 <ImageView
                     android:id="@+id/btn_back"
                     android:layout_width="40dp"
                     android:layout_height="40dp"
                     android:src="@drawable/ic_back"
                     android:layout_margin="16dp"
-                    android:contentDescription="Back"
                     android:padding="8dp" />
 
-
-                <!-- Title and Stats Section -->
+                <!-- Title and Stats -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -55,48 +50,25 @@
                     android:padding="16dp">
 
                     <TextView
+                        android:id="@+id/recipe_title"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Chicken Biryani"
+                        android:text="Loading..."
                         android:textColor="#FFFFFF"
                         android:textSize="24sp"
                         android:textStyle="bold" />
 
+                    <!-- Static Stats for now -->
                     <LinearLayout
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:orientation="horizontal"
                         android:layout_marginTop="8dp"
                         android:gravity="center_vertical">
-
-                        <ImageView
-                            android:layout_width="20dp"
-                            android:layout_height="20dp"
-                            android:src="@drawable/hearts"
-                            android:contentDescription="Likes" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="1000"
-                            android:textColor="#FFFFFF"
-                            android:textSize="14sp"
-                            android:layout_marginLeft="4dp"
-                            android:layout_marginRight="16dp" />
-
-                        <ImageView
-                            android:layout_width="20dp"
-                            android:layout_height="20dp"
-                            android:src="@drawable/ic_download"
-                            android:contentDescription="Downloads" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="325"
-                            android:textColor="#FFFFFF"
-                            android:textSize="14sp"
-                            android:layout_marginLeft="4dp" />
+                        <ImageView android:layout_width="20dp" android:layout_height="20dp" android:src="@drawable/hearts" />
+                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="1000" android:textColor="#FFFFFF" android:textSize="14sp" android:layout_marginLeft="4dp" android:layout_marginRight="16dp" />
+                        <ImageView android:layout_width="20dp" android:layout_height="20dp" android:src="@drawable/ic_download" />
+                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="325" android:textColor="#FFFFFF" android:textSize="14sp" android:layout_marginLeft="4dp" />
                     </LinearLayout>
                 </LinearLayout>
             </RelativeLayout>
@@ -112,15 +84,15 @@
                     android:id="@+id/user_avatar"
                     android:layout_width="48dp"
                     android:layout_height="48dp"
-                    android:src="@drawable/apple"
-                    android:layout_alignParentLeft="true"
-                    android:contentDescription="User Avatar" />
+                    android:src="@drawable/profile"
+                    app:tint="#888888"
+                    android:layout_alignParentLeft="true" />
 
                 <TextView
                     android:id="@+id/username"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="huzaifa_t"
+                    android:text="Loading..."
                     android:textColor="#333333"
                     android:textSize="16sp"
                     android:textStyle="bold"
@@ -142,71 +114,32 @@
                     android:textAllCaps="false" />
             </RelativeLayout>
 
-            <!-- Tags Section -->
+            <!-- Description (Added this so we can see it) -->
+            <TextView
+                android:id="@+id/recipe_desc"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Description..."
+                android:padding="16dp"
+                android:textColor="#555555"
+                android:textSize="14sp"
+                android:background="#FFFFFF"/>
+
+
+            <!-- Tags Section Container -->
             <LinearLayout
+                android:id="@+id/tags_container"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
                 android:background="@drawable/rounded_card_background"
                 android:padding="16dp"
-                android:paddingTop="0dp">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="#Lunch"
-                    android:textColor="#FFFFFF"
-                    android:padding="8dp"
-                    android:paddingLeft="12dp"
-                    android:paddingRight="12dp"
-                    android:textSize="12sp"
-                    android:layout_marginRight="6dp" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="#Asian"
-                    android:textColor="#FFFFFF"
-                    android:padding="8dp"
-                    android:paddingLeft="12dp"
-                    android:paddingRight="12dp"
-                    android:textSize="12sp"
-                    android:layout_marginRight="6dp" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="#Hot"
-                    android:textColor="#FFFFFF"
-                    android:padding="8dp"
-                    android:paddingLeft="12dp"
-                    android:paddingRight="12dp"
-                    android:textSize="12sp"
-                    android:layout_marginRight="6dp" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="#Spicy"
-                    android:textColor="#FFFFFF"
-                    android:padding="8dp"
-                    android:paddingLeft="12dp"
-                    android:paddingRight="12dp"
-                    android:textSize="12sp"
-                    android:layout_marginRight="6dp" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="#Non-Veg"
-                    android:textColor="#FFFFFF"
-                    android:padding="8dp"
-                    android:paddingLeft="12dp"
-                    android:paddingRight="12dp"
-                    android:textSize="12sp" />
+                android:paddingTop="12dp"
+                android:paddingBottom="12dp">
+                <!-- Tags added dynamically -->
             </LinearLayout>
 
-            <!-- Ingredients Section -->
+            <!-- Ingredients Container -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -224,334 +157,16 @@
                     android:textStyle="bold"
                     android:layout_marginBottom="12dp" />
 
-                <!-- Ingredient Items -->
+                <!-- Dynamic Container -->
                 <LinearLayout
+                    android:id="@+id/ingredients_list_container"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical">
-
-                    <RelativeLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginBottom="4dp">
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Basmati rice"
-                            android:textColor="#FFFFFF"
-                            android:textSize="14sp"
-                            android:layout_alignParentLeft="true" />
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="1 cup boiled"
-                            android:textColor="#FFFFFF"
-                            android:textSize="14sp"
-                            android:layout_alignParentRight="true" />
-                    </RelativeLayout>
-
-                    <RelativeLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginBottom="4dp">
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Chicken"
-                            android:textColor="#FFFFFF"
-                            android:textSize="14sp"
-                            android:layout_alignParentLeft="true" />
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="600 g"
-                            android:textColor="#FFFFFF"
-                            android:textSize="14sp"
-                            android:layout_alignParentRight="true" />
-                    </RelativeLayout>
-
-                    <RelativeLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginBottom="4dp">
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Mint leaves"
-                            android:textColor="#FFFFFF"
-                            android:textSize="14sp"
-                            android:layout_alignParentLeft="true" />
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="1/3 tsp"
-                            android:textColor="#FFFFFF"
-                            android:textSize="14sp"
-                            android:layout_alignParentRight="true" />
-                    </RelativeLayout>
-
-                    <RelativeLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginBottom="4dp">
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Bay leaf"
-                            android:textColor="#FFFFFF"
-                            android:textSize="14sp"
-                            android:layout_alignParentLeft="true" />
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="2 medium"
-                            android:textColor="#FFFFFF"
-                            android:textSize="14sp"
-                            android:layout_alignParentRight="true" />
-                    </RelativeLayout>
-
-                    <RelativeLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginBottom="4dp">
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Coriander seeds"
-                            android:textColor="#FFFFFF"
-                            android:textSize="14sp"
-                            android:layout_alignParentLeft="true" />
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="1 tsp"
-                            android:textColor="#FFFFFF"
-                            android:textSize="14sp"
-                            android:layout_alignParentRight="true" />
-                    </RelativeLayout>
-
-                    <RelativeLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginBottom="4dp">
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Turmeric"
-                            android:textColor="#FFFFFF"
-                            android:textSize="14sp"
-                            android:layout_alignParentLeft="true" />
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="1 tsp"
-                            android:textColor="#FFFFFF"
-                            android:textSize="14sp"
-                            android:layout_alignParentRight="true" />
-                    </RelativeLayout>
-
-                    <RelativeLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginBottom="4dp">
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Garlic paste"
-                            android:textColor="#FFFFFF"
-                            android:textSize="14sp"
-                            android:layout_alignParentLeft="true" />
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="1 tbsp"
-                            android:textColor="#FFFFFF"
-                            android:textSize="14sp"
-                            android:layout_alignParentRight="true" />
-                    </RelativeLayout>
-
-                    <RelativeLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginBottom="4dp">
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Ginger paste"
-                            android:textColor="#FFFFFF"
-                            android:textSize="14sp"
-                            android:layout_alignParentLeft="true" />
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="1 tbsp"
-                            android:textColor="#FFFFFF"
-                            android:textSize="14sp"
-                            android:layout_alignParentRight="true" />
-                    </RelativeLayout>
-
-                    <RelativeLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginBottom="4dp">
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Coriander leaves"
-                            android:textColor="#FFFFFF"
-                            android:textSize="14sp"
-                            android:layout_alignParentLeft="true" />
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="2 tbsp"
-                            android:textColor="#FFFFFF"
-                            android:textSize="14sp"
-                            android:layout_alignParentRight="true" />
-                    </RelativeLayout>
-
-                    <RelativeLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginBottom="4dp">
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Green chillies"
-                            android:textColor="#FFFFFF"
-                            android:textSize="14sp"
-                            android:layout_alignParentLeft="true" />
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="4"
-                            android:textColor="#FFFFFF"
-                            android:textSize="14sp"
-                            android:layout_alignParentRight="true" />
-                    </RelativeLayout>
-
-                    <RelativeLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginBottom="4dp">
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Red chilli powder"
-                            android:textColor="#FFFFFF"
-                            android:textSize="14sp"
-                            android:layout_alignParentLeft="true" />
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="1 tsp"
-                            android:textColor="#FFFFFF"
-                            android:textSize="14sp"
-                            android:layout_alignParentRight="true" />
-                    </RelativeLayout>
-
-                    <RelativeLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginBottom="4dp">
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Ginger slices"
-                            android:textColor="#FFFFFF"
-                            android:textSize="14sp"
-                            android:layout_alignParentLeft="true" />
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="1 or (cut in 4 cm pcs)"
-                            android:textColor="#FFFFFF"
-                            android:textSize="14sp"
-                            android:layout_alignParentRight="true" />
-                    </RelativeLayout>
-
-                    <RelativeLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginBottom="4dp">
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Onion"
-                            android:textColor="#FFFFFF"
-                            android:textSize="14sp"
-                            android:layout_alignParentLeft="true" />
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="1 tsp (cooked in ½ cup water)"
-                            android:textColor="#FFFFFF"
-                            android:textSize="14sp"
-                            android:layout_alignParentRight="true" />
-                    </RelativeLayout>
-
-                    <RelativeLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginBottom="4dp">
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Kewra water"
-                            android:textColor="#FFFFFF"
-                            android:textSize="14sp"
-                            android:layout_alignParentLeft="true" />
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="2 drops"
-                            android:textColor="#FFFFFF"
-                            android:textSize="14sp"
-                            android:layout_alignParentRight="true" />
-                    </RelativeLayout>
-
-                    <RelativeLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginBottom="4dp">
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Ghee"
-                            android:textColor="#FFFFFF"
-                            android:textSize="14sp"
-                            android:layout_alignParentLeft="true" />
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="2 tbsp"
-                            android:textColor="#FFFFFF"
-                            android:textSize="14sp"
-                            android:layout_alignParentRight="true" />
-                    </RelativeLayout>
-
-                    <RelativeLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content">
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Salt"
-                            android:textColor="#FFFFFF"
-                            android:textSize="14sp"
-                            android:layout_alignParentLeft="true" />
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="as required"
-                            android:textColor="#FFFFFF"
-                            android:textSize="14sp"
-                            android:layout_alignParentRight="true" />
-                    </RelativeLayout>
                 </LinearLayout>
             </LinearLayout>
 
-            <!-- Steps Section -->
+            <!-- Steps Container -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -570,114 +185,16 @@
                     android:textStyle="bold"
                     android:layout_marginBottom="12dp" />
 
-                <!-- Step 1 -->
+                <!-- Dynamic Container -->
                 <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:layout_marginBottom="12dp">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Step 1"
-                        android:textColor="#FFFFFF"
-                        android:textSize="15sp"
-                        android:textStyle="bold"
-                        android:layout_marginBottom="4dp" />
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="Prepare the saffron water by soaking 1 tsp saffron in ½ cup warm milk. In a large pot, boil 4 cups of water. Rinse the rice until water is clear then soak in water, chop onions and coriander, and set everything aside for later use."
-                        android:textColor="#FFFFFF"
-                        android:textSize="14sp"
-                        android:lineSpacingExtra="2dp" />
-                </LinearLayout>
-
-                <!-- Step 2 -->
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:layout_marginBottom="12dp">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Step 2"
-                        android:textColor="#FFFFFF"
-                        android:textSize="15sp"
-                        android:textStyle="bold"
-                        android:layout_marginBottom="4dp" />
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="Once the oil is hot, add cumin seeds, bay leaf, green and black cardamom, and cloves, then sauté for a minute. Add chopped onion and salt. Cook on Low. Add marinated chicken, garlic paste, ginger paste, red chilli powder, garlic paste, red chilli powder, and green chilli paste, mix well and cook on High for 7 minutes. Stir fry the chicken until it changes color and tender. Spread 1 cup cooked rice and mix."
-                        android:textColor="#FFFFFF"
-                        android:textSize="14sp"
-                        android:lineSpacingExtra="2dp" />
-                </LinearLayout>
-
-                <!-- Step 3 -->
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:layout_marginBottom="12dp">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Step 3"
-                        android:textColor="#FFFFFF"
-                        android:textSize="15sp"
-                        android:textStyle="bold"
-                        android:layout_marginBottom="4dp" />
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="Turn flame to medium and add green masala, ginger, and julienne onions. Add 2 cups rice water, water, and salt and combine. Check the salt and adjust if tender. Spread 1 cup cooked rice pour saffron water and ghee. Also cook uncovered or cover for dum."
-                        android:textColor="#FFFFFF"
-                        android:textSize="14sp"
-                        android:lineSpacingExtra="2dp" />
-                </LinearLayout>
-
-                <!-- Step 4 -->
-                <LinearLayout
+                    android:id="@+id/steps_list_container"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Step 4"
-                        android:textColor="#FFFFFF"
-                        android:textSize="15sp"
-                        android:textStyle="bold"
-                        android:layout_marginBottom="4dp" />
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="Cook for 15-20 minutes with a closed lid and garnish with 1 tbsp fried onions and coriander leaves. Serve hot chicken biryani with raita."
-                        android:textColor="#FFFFFF"
-                        android:textSize="14sp"
-                        android:lineSpacingExtra="2dp" />
                 </LinearLayout>
             </LinearLayout>
 
-            <!-- Bottom Spacing -->
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="16dp" />
-
+            <View android:layout_width="match_parent" android:layout_height="20dp" />
         </LinearLayout>
     </ScrollView>
-
-
-
 </RelativeLayout>
