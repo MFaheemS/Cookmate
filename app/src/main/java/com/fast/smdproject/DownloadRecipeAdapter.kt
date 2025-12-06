@@ -112,6 +112,14 @@ class DownloadRecipeAdapter(
             }
         }
 
+        // Clock icon click - open set timer activity
+        holder.iconClock.setOnClickListener {
+            val intent = Intent(context, SetTimerActivity::class.java)
+            intent.putExtra("RECIPE_ID", recipe.recipeId)
+            intent.putExtra("RECIPE_TITLE", recipe.title)
+            context.startActivity(intent)
+        }
+
         holder.btnDetails.setOnClickListener {
             val intent = Intent(context, RecipeDetail::class.java)
             intent.putExtra("RECIPE_ID", recipe.recipeId)

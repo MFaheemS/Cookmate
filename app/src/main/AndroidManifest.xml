@@ -5,6 +5,9 @@
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-feature android:name="android.hardware.camera" android:required="true" />
     <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM"/>
+    <uses-permission android:name="android.permission.USE_EXACT_ALARM"/>
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
 
     <application
 
@@ -47,8 +50,18 @@
             android:name=".setTimer"
             android:exported="false" />
         <activity
+            android:name=".SetTimerActivity"
+            android:exported="false" />
+        <activity
             android:name=".reminder"
             android:exported="false" />
+
+        <!-- Broadcast Receiver for Reminders -->
+        <receiver
+            android:name=".ReminderReceiver"
+            android:enabled="true"
+            android:exported="false" />
+
         <activity
             android:name=".editRecipe"
             android:exported="false" />

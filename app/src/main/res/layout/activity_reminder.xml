@@ -59,132 +59,22 @@
             android:layout_marginRight="32dp"
             android:layout_marginBottom="16dp" />
 
-        <!-- ScrollView for Reminder Items -->
-        <ScrollView
+        <!-- RecyclerView for Reminder Items -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/remindersRecyclerView"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
-            android:fillViewport="true">
-
-            <LinearLayout
-                android:id="@+id/bottom_navigation"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:paddingLeft="16dp"
-                android:paddingRight="16dp">
-
-                <!-- Reminder Item 1: Chicken Biryani -->
-                <RelativeLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="16dp">
-
-                    <!-- Recipe Image -->
-                    <ImageView
-                        android:id="@+id/img_biryani"
-                        android:layout_width="80dp"
-                        android:layout_height="80dp"
-                        android:src="@drawable/biryani"
-                        android:scaleType="centerCrop"
-                        android:layout_alignParentLeft="true"
-                        android:contentDescription="Chicken Biryani" />
-
-                    <!-- Info Container -->
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_toRightOf="@id/img_biryani"
-                        android:layout_toLeftOf="@id/btn_edit_1"
-                        android:layout_marginLeft="12dp"
-                        android:layout_marginRight="12dp"
-                        android:orientation="vertical"
-                        android:layout_centerVertical="true">
-
-                        <!-- Recipe Name and Time -->
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:background="@drawable/reminder_name_background"
-                            android:orientation="vertical"
-                            android:padding="8dp"
-                            android:layout_marginBottom="4dp">
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="Chicken Biryani"
-                                android:textColor="#FFFFFF"
-                                android:textSize="16sp"
-                                android:textStyle="bold" />
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="02:00    PM"
-                                android:textColor="#FFFFFF"
-                                android:textSize="14sp"
-                                android:layout_marginTop="4dp" />
-                        </LinearLayout>
-
-                        <!-- Time Left -->
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:background="@drawable/reminder_time_background"
-                            android:padding="8dp"
-                            android:orientation="horizontal"
-                            android:gravity="center_vertical">
-
-                            <ImageView
-                                android:layout_width="16dp"
-                                android:layout_height="16dp"
-                                android:src="@drawable/clock"
-                                android:contentDescription="Clock" />
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="3 hr left"
-                                android:textColor="#FFFFFF"
-                                android:textSize="14sp"
-                                android:layout_marginLeft="8dp" />
-                        </LinearLayout>
-                    </LinearLayout>
-
-                    <!-- Edit Button -->
-                    <Button
-                        android:id="@+id/btn_edit_1"
-                        android:layout_width="wrap_content"
-                        android:layout_height="36dp"
-                        android:text="Edit"
-                        android:textColor="#FFFFFF"
-                        android:background="@drawable/followbutton"
-                        android:layout_alignParentRight="true"
-                        android:layout_centerVertical="true"
-                        android:paddingLeft="20dp"
-                        android:paddingRight="20dp"
-                        android:textAllCaps="false"
-                        android:backgroundTint="#03A9F4"
-                        app:backgroundTint="@null"/>
-                </RelativeLayout>
-
-                <!-- Divider -->
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:background="#FFC107"
-                    android:layout_marginBottom="16dp" />
-
-
-            </LinearLayout>
-        </ScrollView>
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp"
+            android:paddingTop="8dp"
+            android:clipToPadding="false" />
     </LinearLayout>
 
 
     <!-- Bottom Navigation -->
     <LinearLayout
-        android:id="@+id/bottomNavigation"
+        android:id="@+id/bottom_navigation"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"

@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.android.volley.Request
 import com.android.volley.toolbox.JsonObjectRequest
 import com.android.volley.toolbox.Volley
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 import org.json.JSONException
 
 class DownloadsActivity : AppCompatActivity() {
@@ -29,6 +30,7 @@ class DownloadsActivity : AppCompatActivity() {
         val btnUpload = findViewById<ImageButton>(R.id.upload)
         val profileBtn = findViewById<ImageButton>(R.id.profile)
         val favoriteBtn = findViewById<Button>(R.id.btnFavorites)
+        val fabReminders = findViewById<FloatingActionButton>(R.id.fabReminders)
 
         // Setup RecyclerView
         recyclerView = findViewById<RecyclerView>(R.id.downloadsRecyclerView)
@@ -40,12 +42,16 @@ class DownloadsActivity : AppCompatActivity() {
         // Fetch downloaded recipes
         fetchDownloadedRecipes()
 
+        // Navigation listeners
         favoriteBtn.setOnClickListener { startActivity(Intent(this, FavoritesActivity::class.java)) }
         btnHome.setOnClickListener { startActivity(Intent(this, HomePage::class.java)) }
         btnUpload.setOnClickListener { startActivity(Intent(this, UploadRecipe::class.java)) }
         searchBtn.setOnClickListener { startActivity(Intent(this, SearchUserActivity::class.java)) }
         profileBtn.setOnClickListener {
             startActivity(Intent(this, UserProfileActivity::class.java))
+        }
+        fabReminders.setOnClickListener {
+            startActivity(Intent(this, reminder::class.java))
         }
     }
 

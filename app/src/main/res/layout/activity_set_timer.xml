@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="#FFFFFF"
     android:padding="24dp">
 
@@ -29,212 +29,27 @@
         android:gravity="center">
 
         <!-- Hour Picker -->
-        <LinearLayout
+        <NumberPicker
+            android:id="@+id/hourPicker"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:gravity="center"
-            android:layout_marginRight="24dp">
-
-            <TextView
-                android:layout_width="60dp"
-                android:layout_height="wrap_content"
-                android:text="1"
-                android:textColor="#CCCCCC"
-                android:textSize="32sp"
-                android:gravity="center"
-                android:padding="8dp" />
-
-            <View
-                android:layout_width="60dp"
-                android:layout_height="2dp"
-                android:background="#CCCCCC" />
-
-            <TextView
-                android:layout_width="60dp"
-                android:layout_height="wrap_content"
-                android:text="2"
-                android:textColor="#000000"
-                android:textSize="40sp"
-                android:textStyle="bold"
-                android:gravity="center"
-                android:padding="8dp" />
-
-            <View
-                android:layout_width="60dp"
-                android:layout_height="2dp"
-                android:background="#000000" />
-
-            <TextView
-                android:layout_width="60dp"
-                android:layout_height="wrap_content"
-                android:text="3"
-                android:textColor="#000000"
-                android:textSize="32sp"
-                android:gravity="center"
-                android:padding="8dp" />
-
-            <View
-                android:layout_width="60dp"
-                android:layout_height="2dp"
-                android:background="#000000" />
-
-            <TextView
-                android:layout_width="60dp"
-                android:layout_height="wrap_content"
-                android:text="4"
-                android:textColor="#000000"
-                android:textSize="32sp"
-                android:gravity="center"
-                android:padding="8dp" />
-
-            <View
-                android:layout_width="60dp"
-                android:layout_height="2dp"
-                android:background="#CCCCCC" />
-
-            <TextView
-                android:layout_width="60dp"
-                android:layout_height="wrap_content"
-                android:text="5"
-                android:textColor="#CCCCCC"
-                android:textSize="32sp"
-                android:gravity="center"
-                android:padding="8dp" />
-        </LinearLayout>
+            android:layout_height="200dp"
+            android:layout_marginRight="16dp"
+            android:theme="@style/NumberPickerStyle" />
 
         <!-- Minute Picker -->
-        <LinearLayout
+        <NumberPicker
+            android:id="@+id/minutePicker"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:gravity="center"
-            android:layout_marginRight="24dp">
-
-            <TextView
-                android:layout_width="60dp"
-                android:layout_height="wrap_content"
-                android:text="00"
-                android:textColor="#CCCCCC"
-                android:textSize="32sp"
-                android:gravity="center"
-                android:padding="8dp" />
-
-            <View
-                android:layout_width="60dp"
-                android:layout_height="2dp"
-                android:background="#CCCCCC" />
-
-            <TextView
-                android:layout_width="60dp"
-                android:layout_height="wrap_content"
-                android:text="01"
-                android:textColor="#000000"
-                android:textSize="35sp"
-                android:textStyle="bold"
-                android:gravity="center"
-                android:padding="8dp" />
-
-            <View
-                android:layout_width="60dp"
-                android:layout_height="2dp"
-                android:background="#000000" />
-
-            <TextView
-                android:layout_width="60dp"
-                android:layout_height="wrap_content"
-                android:text="02"
-                android:textColor="#000000"
-                android:textSize="32sp"
-                android:gravity="center"
-                android:padding="8dp" />
-
-            <View
-                android:layout_width="60dp"
-                android:layout_height="2dp"
-                android:background="#000000" />
-
-            <TextView
-                android:layout_width="60dp"
-                android:layout_height="wrap_content"
-                android:text="03"
-                android:textColor="#000000"
-                android:textSize="32sp"
-                android:gravity="center"
-                android:padding="8dp" />
-
-            <View
-                android:layout_width="60dp"
-                android:layout_height="2dp"
-                android:background="#CCCCCC" />
-
-            <TextView
-                android:layout_width="60dp"
-                android:layout_height="wrap_content"
-                android:text="04"
-                android:textColor="#CCCCCC"
-                android:textSize="32sp"
-                android:gravity="center"
-                android:padding="8dp" />
-        </LinearLayout>
+            android:layout_height="200dp"
+            android:layout_marginRight="16dp"
+            android:theme="@style/NumberPickerStyle" />
 
         <!-- AM/PM Picker -->
-        <LinearLayout
+        <NumberPicker
+            android:id="@+id/amPmPicker"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:gravity="center">
-
-            <TextView
-                android:layout_width="60dp"
-                android:layout_height="wrap_content"
-                android:text=""
-                android:textSize="32sp"
-                android:gravity="center"
-                android:padding="8dp" />
-
-            <View
-                android:layout_width="60dp"
-                android:layout_height="2dp"
-                android:background="#CCCCCC" />
-
-            <TextView
-                android:layout_width="60dp"
-                android:layout_height="wrap_content"
-                android:text="AM"
-                android:textColor="#000000"
-                android:textSize="28sp"
-                android:textStyle="bold"
-                android:gravity="center"
-                android:padding="8dp" />
-
-            <View
-                android:layout_width="60dp"
-                android:layout_height="2dp"
-                android:background="#000000" />
-
-            <TextView
-                android:layout_width="60dp"
-                android:layout_height="wrap_content"
-                android:text="PM"
-                android:textColor="#000000"
-                android:textSize="28sp"
-                android:gravity="center"
-                android:padding="8dp" />
-
-            <View
-                android:layout_width="60dp"
-                android:layout_height="2dp"
-                android:background="#CCCCCC" />
-
-            <TextView
-                android:layout_width="60dp"
-                android:layout_height="wrap_content"
-                android:text=""
-                android:textSize="32sp"
-                android:gravity="center"
-                android:padding="8dp" />
-        </LinearLayout>
+            android:layout_height="200dp"
+            android:theme="@style/NumberPickerStyle" />
     </LinearLayout>
 
     <!-- Confirm Timer Button -->
