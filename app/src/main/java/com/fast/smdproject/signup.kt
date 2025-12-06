@@ -126,26 +126,32 @@ class signup : AppCompatActivity() {
                 val json = JSONObject(response)
 
                 if (json.getInt("status") == 1) {
+                    // Extract user data from response
+                    val userObj = json.optJSONObject("user")
+                    if (userObj != null) {
+                        val userId = userObj.optInt("user_id", 0)
 
+                        val db = UserDatabase(this)
+                        db.saveUser(
+                            userId,
+                            username,
+                            firstName,
+                            lastName,
+                            email,
+                            encodedImage
+                        )
 
-                    val db = UserDatabase(this)
-                    db.saveUser(
-                        username,
-                        firstName,
-                        lastName,
-                        email,
-                        encodedImage
-                    )
+                        Toast.makeText(this, "Signup successful!", Toast.LENGTH_LONG).show()
 
-                    Toast.makeText(this, "Signup successful!", Toast.LENGTH_LONG).show()
-
-                    val intent = Intent(this, HomePage::class.java)
-                    startActivity(intent)
-                    finish()
+                        val intent = Intent(this, HomePage::class.java)
+                        startActivity(intent)
+                        finish()
+                    } else {
+                        Toast.makeText(this, "Signup successful but failed to save user data.", Toast.LENGTH_LONG).show()
+                    }
+                } else {
+                    Toast.makeText(this, json.getString("message"), Toast.LENGTH_LONG).show()
                 }
-
-
-                Toast.makeText(this, json.getString("message"), Toast.LENGTH_LONG).show()
             },
             { error ->
                 Toast.makeText(this, "Error: ${error.message}", Toast.LENGTH_LONG).show()

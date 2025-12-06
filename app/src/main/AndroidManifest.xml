@@ -56,7 +56,13 @@
             android:name=".RecipeDetail"
             android:exported="false" />
         <activity
-            android:name=".search"
+            android:name=".SearchRecipeActivity"
+            android:exported="false" />
+        <activity
+            android:name=".SearchUserActivity"
+            android:exported="false" />
+        <activity
+            android:name=".SecondUserProfileActivity"
             android:exported="false" />
         <activity
             android:name=".followers"

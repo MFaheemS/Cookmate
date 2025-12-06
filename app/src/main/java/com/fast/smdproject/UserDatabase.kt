@@ -6,13 +6,14 @@ import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
 
 class UserDatabase(context: Context) :
-    SQLiteOpenHelper(context, "user_db", null, 2) { // Changed version to 2
+    SQLiteOpenHelper(context, "user_db", null, 4) { // Changed version to 4
 
     override fun onCreate(db: SQLiteDatabase) {
 
         db.execSQL(
             "CREATE TABLE user (" +
                     "id INTEGER PRIMARY KEY AUTOINCREMENT," +
+                    "user_id INTEGER," +
                     "username TEXT," +
                     "first_name TEXT," +
                     "last_name TEXT," +
@@ -21,8 +22,10 @@ class UserDatabase(context: Context) :
                     ")"
         )
 
-
         createPendingTable(db)
+        createFollowersTable(db)
+        createFollowingTable(db)
+        createSyncInfoTable(db)
     }
 
     private fun createPendingTable(db: SQLiteDatabase) {
@@ -41,22 +44,192 @@ class UserDatabase(context: Context) :
         )
     }
 
+    private fun createFollowersTable(db: SQLiteDatabase) {
+        db.execSQL(
+            "CREATE TABLE cached_followers (" +
+                    "id INTEGER PRIMARY KEY AUTOINCREMENT," +
+                    "user_id INTEGER," +
+                    "username TEXT," +
+                    "first_name TEXT," +
+                    "last_name TEXT," +
+                    "profile_image TEXT" +
+                    ")"
+        )
+    }
+
+    private fun createFollowingTable(db: SQLiteDatabase) {
+        db.execSQL(
+            "CREATE TABLE cached_following (" +
+                    "id INTEGER PRIMARY KEY AUTOINCREMENT," +
+                    "user_id INTEGER," +
+                    "username TEXT," +
+                    "first_name TEXT," +
+                    "last_name TEXT," +
+                    "profile_image TEXT" +
+                    ")"
+        )
+    }
+
+    private fun createSyncInfoTable(db: SQLiteDatabase) {
+        db.execSQL(
+            "CREATE TABLE sync_info (" +
+                    "id INTEGER PRIMARY KEY," +
+                    "type TEXT," +
+                    "last_sync_time INTEGER" +
+                    ")"
+        )
+    }
+
     override fun onUpgrade(db: SQLiteDatabase, oldV: Int, newV: Int) {
         if (oldV < 2) {
             createPendingTable(db)
         }
+        if (oldV < 3) {
+            // Add user_id column if upgrading from version 2
+            db.execSQL("ALTER TABLE user ADD COLUMN user_id INTEGER")
+        }
+        if (oldV < 4) {
+            createFollowersTable(db)
+            createFollowingTable(db)
+            createSyncInfoTable(db)
+        }
     }
 
 
-    fun saveUser(username: String, first: String, last: String, email: String, image: String?) {
+    fun saveUser(userId: Int, username: String, first: String, last: String, email: String, image: String?) {
         val db = writableDatabase
         db.execSQL("DELETE FROM user")
         val profileImage = image ?: ""
         db.execSQL(
-            "INSERT INTO user (username, first_name, last_name, email, profile_image) VALUES (?, ?, ?, ?, ?)",
-            arrayOf(username, first, last, email, profileImage)
+            "INSERT INTO user (user_id, username, first_name, last_name, email, profile_image) VALUES (?, ?, ?, ?, ?, ?)",
+            arrayOf<Any>(userId, username, first, last, email, profileImage)
         )
         db.close()
+    }
+
+    fun getCurrentUserId(): Int {
+        val db = readableDatabase
+        val cursor = db.rawQuery("SELECT user_id FROM user LIMIT 1", null)
+        var userId = 0
+        if (cursor.moveToFirst()) {
+            userId = cursor.getInt(0)
+        }
+        cursor.close()
+        db.close()
+        return userId
+    }
+
+    fun getUserInfo(): Map<String, String> {
+        val db = readableDatabase
+        val cursor = db.rawQuery("SELECT username, first_name, last_name, profile_image FROM user LIMIT 1", null)
+        val info = mutableMapOf<String, String>()
+        if (cursor.moveToFirst()) {
+            info["username"] = cursor.getString(0) ?: ""
+            info["first_name"] = cursor.getString(1) ?: ""
+            info["last_name"] = cursor.getString(2) ?: ""
+            info["profile_image"] = cursor.getString(3) ?: ""
+        }
+        cursor.close()
+        db.close()
+        return info
+    }
+
+    // Followers methods
+    fun saveFollowers(followers: List<User>) {
+        val db = writableDatabase
+        db.execSQL("DELETE FROM cached_followers")
+
+        followers.forEach { user ->
+            db.execSQL(
+                "INSERT INTO cached_followers (user_id, username, first_name, last_name, profile_image) VALUES (?, ?, ?, ?, ?)",
+                arrayOf<Any>(user.userId, user.username, user.firstName, user.lastName, user.profileImage ?: "")
+            )
+        }
+
+        // Update sync time
+        val currentTime = System.currentTimeMillis()
+        db.execSQL("DELETE FROM sync_info WHERE type = 'followers'")
+        db.execSQL("INSERT INTO sync_info (type, last_sync_time) VALUES ('followers', ?)", arrayOf<Any>(currentTime))
+
+        db.close()
+    }
+
+    fun getCachedFollowers(): List<User> {
+        val db = readableDatabase
+        val cursor = db.rawQuery("SELECT user_id, username, first_name, last_name, profile_image FROM cached_followers", null)
+        val followers = mutableListOf<User>()
+
+        while (cursor.moveToNext()) {
+            followers.add(
+                User(
+                    userId = cursor.getInt(0),
+                    username = cursor.getString(1),
+                    firstName = cursor.getString(2),
+                    lastName = cursor.getString(3),
+                    profileImage = cursor.getString(4)
+                )
+            )
+        }
+
+        cursor.close()
+        db.close()
+        return followers
+    }
+
+    // Following methods
+    fun saveFollowing(following: List<User>) {
+        val db = writableDatabase
+        db.execSQL("DELETE FROM cached_following")
+
+        following.forEach { user ->
+            db.execSQL(
+                "INSERT INTO cached_following (user_id, username, first_name, last_name, profile_image) VALUES (?, ?, ?, ?, ?)",
+                arrayOf<Any>(user.userId, user.username, user.firstName, user.lastName, user.profileImage ?: "")
+            )
+        }
+
+        // Update sync time
+        val currentTime = System.currentTimeMillis()
+        db.execSQL("DELETE FROM sync_info WHERE type = 'following'")
+        db.execSQL("INSERT INTO sync_info (type, last_sync_time) VALUES ('following', ?)", arrayOf<Any>(currentTime))
+
+        db.close()
+    }
+
+    fun getCachedFollowing(): List<User> {
+        val db = readableDatabase
+        val cursor = db.rawQuery("SELECT user_id, username, first_name, last_name, profile_image FROM cached_following", null)
+        val following = mutableListOf<User>()
+
+        while (cursor.moveToNext()) {
+            following.add(
+                User(
+                    userId = cursor.getInt(0),
+                    username = cursor.getString(1),
+                    firstName = cursor.getString(2),
+                    lastName = cursor.getString(3),
+                    profileImage = cursor.getString(4)
+                )
+            )
+        }
+
+        cursor.close()
+        db.close()
+        return following
+    }
+
+    fun getLastSyncTime(type: String): Long {
+        val db = readableDatabase
+        val cursor = db.rawQuery("SELECT last_sync_time FROM sync_info WHERE type = ?", arrayOf(type))
+        var syncTime = 0L
+
+        if (cursor.moveToFirst()) {
+            syncTime = cursor.getLong(0)
+        }
+
+        cursor.close()
+        db.close()
+        return syncTime
     }
 
     fun isLoggedIn(): Boolean {

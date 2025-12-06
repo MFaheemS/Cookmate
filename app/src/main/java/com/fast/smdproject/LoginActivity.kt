@@ -79,6 +79,7 @@ class LoginActivity : AppCompatActivity() {
                     if (status == 1) {
                         val userObj = json.optJSONObject("user")
                         if (userObj != null) {
+                            val userId = userObj.optInt("user_id", 0)
                             val usernameResp = userObj.optString("username", "")
                             val firstName = userObj.optString("first_name", "")
                             val lastName = userObj.optString("last_name", "")
@@ -98,7 +99,7 @@ class LoginActivity : AppCompatActivity() {
 
 
                                         val db = UserDatabase(this)
-                                        db.saveUser(usernameResp, firstName, lastName, email, imageBase64)
+                                        db.saveUser(userId, usernameResp, firstName, lastName, email, imageBase64)
 
                                         Toast.makeText(this, "Login successful.", Toast.LENGTH_SHORT).show()
                                         startActivity(Intent(this, HomePage::class.java))
@@ -108,7 +109,7 @@ class LoginActivity : AppCompatActivity() {
                                     { error ->
 
                                         val db = UserDatabase(this)
-                                        db.saveUser(usernameResp, firstName, lastName, email, null)
+                                        db.saveUser(userId, usernameResp, firstName, lastName, email, null)
                                         Toast.makeText(this, "Login successful (image not loaded).", Toast.LENGTH_SHORT).show()
                                         startActivity(Intent(this, HomePage::class.java))
                                         finish()
@@ -118,7 +119,7 @@ class LoginActivity : AppCompatActivity() {
                             } else {
 
                                 val db = UserDatabase(this)
-                                db.saveUser(usernameResp, firstName, lastName, email, null)
+                                db.saveUser(userId, usernameResp, firstName, lastName, email, null)
                                 Toast.makeText(this, "Login successful.", Toast.LENGTH_SHORT).show()
                                 startActivity(Intent(this, HomePage::class.java))
                                 finish()

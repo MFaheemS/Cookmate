@@ -3,8 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#FFFFFF"
-    android:id="@+id/search">
+    android:background="#FFFFFF">
 
     <RelativeLayout
         android:id="@+id/header_bar"
@@ -98,6 +97,7 @@
             android:layout_weight="1"
             android:gravity="center">
             <ImageView android:layout_width="28dp" android:layout_height="28dp" android:src="@drawable/search"
+                android:id="@+id/search"
                 app:tint="@color/black"/>
         </LinearLayout>
 

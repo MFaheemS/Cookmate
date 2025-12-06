@@ -1,0 +1,64 @@
+package com.fast.smdproject
+
+import android.content.Context
+import android.content.Intent
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.Button
+import android.widget.ImageView
+import android.widget.TextView
+import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
+
+class UserAdapter(
+    private val context: Context,
+    private val userList: List<User>,
+    private val ipAddress: String
+) : RecyclerView.Adapter<UserAdapter.UserViewHolder>() {
+
+    inner class UserViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        val userAvatar: ImageView = itemView.findViewById(R.id.userAvatar)
+        val userName: TextView = itemView.findViewById(R.id.userName)
+        val userFullName: TextView = itemView.findViewById(R.id.userFullName)
+        val btnFollow: Button = itemView.findViewById(R.id.btnFollow)
+    }
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): UserViewHolder {
+        val view = LayoutInflater.from(context).inflate(R.layout.item_user, parent, false)
+        return UserViewHolder(view)
+    }
+
+    override fun onBindViewHolder(holder: UserViewHolder, position: Int) {
+        val user = userList[position]
+
+        holder.userName.text = "@${user.username}"
+        holder.userFullName.text = "${user.firstName} ${user.lastName}"
+
+        // Load profile image if available
+        if (!user.profileImage.isNullOrEmpty()) {
+            val imageUrl = "http://$ipAddress/cookMate/${user.profileImage}"
+            Glide.with(context)
+                .load(imageUrl)
+                .placeholder(R.drawable.default_avatar)
+                .error(R.drawable.default_avatar)
+                .into(holder.userAvatar)
+        } else {
+            holder.userAvatar.setImageResource(R.drawable.default_avatar)
+        }
+
+        // Click on entire item or button to view profile
+        val clickListener = View.OnClickListener {
+            val intent = Intent(context, SecondUserProfileActivity::class.java)
+            intent.putExtra("user_id", user.userId)
+            intent.putExtra("username", user.username)
+            context.startActivity(intent)
+        }
+
+        holder.itemView.setOnClickListener(clickListener)
+        holder.btnFollow.setOnClickListener(clickListener)
+    }
+
+    override fun getItemCount(): Int = userList.size
+}
+

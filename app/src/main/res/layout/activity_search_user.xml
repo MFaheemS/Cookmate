@@ -15,7 +15,7 @@
         android:padding="16dp"
         android:elevation="4dp">
 
-        <!-- Menu Icon -->
+        <!-- Back Icon -->
         <ImageView
             android:id="@+id/menuIcon"
             android:layout_width="32dp"
@@ -24,6 +24,17 @@
             android:layout_centerVertical="true"
             android:src="@drawable/back"
             android:clickable="true" />
+
+        <!-- Title -->
+        <TextView
+            android:id="@+id/titleText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:text="Search Users"
+            android:textColor="#000000"
+            android:textSize="18sp"
+            android:textStyle="bold" />
 
         <!-- Profile Icon -->
         <ImageView
@@ -34,74 +45,21 @@
             android:layout_centerVertical="true"
             android:src="@drawable/profile"
             android:clickable="true"
-            android:tint="@color/black"/>
+            app:tint="@color/black"/>
 
     </RelativeLayout>
-
-    <!-- Profile Section -->
-    <LinearLayout
-        android:id="@+id/profileSection"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/topBar"
-        android:orientation="vertical"
-        android:gravity="center"
-        android:background="#FFFFFF"
-        android:paddingTop="16dp"
-        android:paddingBottom="16dp">
-
-        <!-- Profile Image -->
-        <ImageView
-            android:id="@+id/profileImage"
-            android:layout_width="100dp"
-            android:layout_height="100dp"
-            android:background="@drawable/imgbackground"
-            android:scaleType="centerCrop" />
-
-        <!-- Username -->
-        <TextView
-            android:id="@+id/username"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="steve_jobs"
-            android:textColor="#000000"
-            android:textSize="18sp"
-            android:textStyle="bold"
-            android:layout_marginTop="12dp" />
-
-        <!-- Last Sync -->
-        <TextView
-            android:id="@+id/lastSync"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Last sync: 10 days ago"
-            android:textColor="#999999"
-            android:textSize="12sp"
-            android:layout_marginTop="4dp" />
-
-        <!-- Followings Title -->
-        <TextView
-            android:id="@+id/followingsTitle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="followings"
-            android:textColor="#000000"
-            android:textSize="16sp"
-            android:textStyle="bold"
-            android:layout_marginTop="12dp" />
-
-    </LinearLayout>
 
     <!-- Search and Results Section -->
     <LinearLayout
         android:id="@+id/searchSection"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/profileSection"
+        android:layout_below="@id/topBar"
         android:orientation="vertical"
         android:background="#FFFFFF"
         android:paddingLeft="16dp"
         android:paddingRight="16dp"
+        android:paddingTop="16dp"
         android:paddingBottom="8dp">
 
         <!-- Search Bar -->
@@ -148,7 +106,7 @@
                 android:id="@+id/resultsCount"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="127 results"
+                android:text="0 results"
                 android:textColor="#000000"
                 android:textSize="14sp"
                 android:layout_alignParentLeft="true" />
@@ -181,7 +139,7 @@
 
     </LinearLayout>
 
-    <!-- Followers List -->
+    <!-- Users List -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerViewUsers"
         android:layout_width="match_parent"
@@ -197,11 +155,11 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:background="@drawable/backgroundbutton"
-        android:elevation="8dp"
         android:orientation="horizontal"
+        android:background="@drawable/backgroundbutton"
         android:paddingTop="12dp"
         android:paddingBottom="12dp"
+        android:elevation="8dp"
         android:weightSum="5">
 
         <!-- Home -->
@@ -209,11 +167,12 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:clickable="true"
+            android:orientation="vertical"
             android:gravity="center"
-            android:orientation="vertical">
+            android:clickable="true">
 
             <ImageView
+                android:id="@+id/homeNav"
                 android:layout_width="28dp"
                 android:layout_height="28dp"
                 android:src="@drawable/home" />
@@ -225,14 +184,16 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:clickable="true"
+            android:orientation="vertical"
             android:gravity="center"
-            android:orientation="vertical">
+            android:clickable="true">
 
             <ImageView
+                android:id="@+id/searchNav"
                 android:layout_width="28dp"
                 android:layout_height="28dp"
-                android:src="@drawable/search" />
+                android:src="@drawable/search"
+                app:tint="@color/black" />
 
         </LinearLayout>
 
@@ -241,11 +202,12 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:clickable="true"
+            android:orientation="vertical"
             android:gravity="center"
-            android:orientation="vertical">
+            android:clickable="true">
 
             <ImageView
+                android:id="@+id/uploadNav"
                 android:layout_width="28dp"
                 android:layout_height="28dp"
                 android:src="@drawable/add" />
@@ -257,15 +219,16 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:clickable="true"
+            android:orientation="vertical"
             android:gravity="center"
-            android:orientation="vertical">
+            android:clickable="true">
 
             <ImageView
+                android:id="@+id/libNav"
                 android:layout_width="28dp"
                 android:layout_height="28dp"
                 android:src="@drawable/ic_library"
-                android:tint="@color/bg_light" />
+                app:tint="@color/bg_light"/>
 
         </LinearLayout>
 
@@ -274,18 +237,20 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:clickable="true"
+            android:orientation="vertical"
             android:gravity="center"
-            android:orientation="vertical">
+            android:clickable="true">
 
             <ImageView
+                android:id="@+id/profileNav"
                 android:layout_width="28dp"
                 android:layout_height="28dp"
                 android:src="@drawable/profile"
-                app:tint="@color/black" />
+                app:tint="@color/bg_light"/>
 
         </LinearLayout>
 
     </LinearLayout>
 
 </RelativeLayout>
+

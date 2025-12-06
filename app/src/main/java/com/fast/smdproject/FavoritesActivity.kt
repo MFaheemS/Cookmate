@@ -36,7 +36,7 @@ class FavoritesActivity : AppCompatActivity() {
         downloadBtn.setOnClickListener { startActivity(Intent(this, DownloadsActivity::class.java)) }
         btnHome.setOnClickListener { startActivity(Intent(this, HomePage::class.java)) }
         btnUpload.setOnClickListener { startActivity(Intent(this, UploadRecipe::class.java)) }
-        searchBtn.setOnClickListener { startActivity(Intent(this, search::class.java)) }
+        searchBtn.setOnClickListener { startActivity(Intent(this, SearchUserActivity::class.java)) }
         profileBtn.setOnClickListener {
             startActivity(
                 Intent(
