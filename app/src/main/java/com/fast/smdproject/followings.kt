@@ -1,9 +1,11 @@
 package com.fast.smdproject
 
 import android.content.Intent
+import android.graphics.BitmapFactory
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.Base64
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.TextView
@@ -14,7 +16,6 @@ import androidx.recyclerview.widget.RecyclerView
 import com.android.volley.Request
 import com.android.volley.toolbox.JsonObjectRequest
 import com.android.volley.toolbox.Volley
-import com.bumptech.glide.Glide
 import org.json.JSONException
 import java.util.concurrent.TimeUnit
 
@@ -28,6 +29,7 @@ class followings : AppCompatActivity() {
     private lateinit var lastSync: TextView
     private lateinit var refreshText: TextView
     private lateinit var resultsCount: TextView
+    private lateinit var followingsTitle: TextView
     private val followingList = ArrayList<User>()
     private var allFollowing = ArrayList<User>()
 
@@ -40,6 +42,9 @@ class followings : AppCompatActivity() {
 
         // Setup RecyclerView
         setupRecyclerView()
+
+        // Setup bottom navigation
+        setupBottomNavigation()
 
         // Load user profile info
         loadUserProfileInfo()
@@ -62,6 +67,10 @@ class followings : AppCompatActivity() {
         lastSync = findViewById(R.id.lastSync)
         refreshText = findViewById(R.id.refreshText)
         resultsCount = findViewById(R.id.resultsCount)
+        followingsTitle = findViewById(R.id.followingsTitle)
+
+        // Set the title to "Following"
+        followingsTitle.text = "Following"
 
         val menuIcon = findViewById<ImageView>(R.id.menuIcon)
         val profileIcon = findViewById<ImageView>(R.id.profileIcon)
@@ -97,21 +106,55 @@ class followings : AppCompatActivity() {
         recyclerView.adapter = userAdapter
     }
 
+    private fun setupBottomNavigation() {
+        val bottomNav = findViewById<android.widget.LinearLayout>(R.id.bottomNavigation)
+
+        // Get all LinearLayouts (navigation items)
+        val navItems = mutableListOf<android.widget.LinearLayout>()
+        for (i in 0 until bottomNav.childCount) {
+            val child = bottomNav.getChildAt(i)
+            if (child is android.widget.LinearLayout) {
+                navItems.add(child)
+            }
+        }
+
+        // Setup click listeners (order: home, search, upload, lib, profile)
+        if (navItems.size >= 5) {
+            navItems[0].setOnClickListener {
+                startActivity(Intent(this, HomePage::class.java))
+            }
+            navItems[1].setOnClickListener {
+                startActivity(Intent(this, SearchUserActivity::class.java))
+            }
+            navItems[2].setOnClickListener {
+                startActivity(Intent(this, UploadRecipe::class.java))
+            }
+            navItems[3].setOnClickListener {
+                startActivity(Intent(this, DownloadsActivity::class.java))
+            }
+            navItems[4].setOnClickListener {
+                startActivity(Intent(this, UserProfileActivity::class.java))
+            }
+        }
+    }
+
     private fun loadUserProfileInfo() {
         val db = UserDatabase(this)
         val userInfo = db.getUserInfo()
 
         username.text = userInfo["username"] ?: "User"
 
-        val profileImagePath = userInfo["profile_image"] ?: ""
-        if (profileImagePath.isNotEmpty() && profileImagePath != "null") {
-            val ipAddress = getString(R.string.ipAddress)
-            val imageUrl = "http://$ipAddress/cookMate/$profileImagePath"
-            Glide.with(this)
-                .load(imageUrl)
-                .placeholder(R.drawable.profile_image)
-                .error(R.drawable.profile_image)
-                .into(profileImage)
+        val profileImageBase64 = userInfo["profile_image"] ?: ""
+        if (profileImageBase64.isNotEmpty() && profileImageBase64 != "null") {
+            try {
+                // Decode base64 string to bitmap
+                val decodedBytes = Base64.decode(profileImageBase64, Base64.DEFAULT)
+                val bitmap = BitmapFactory.decodeByteArray(decodedBytes, 0, decodedBytes.size)
+                profileImage.setImageBitmap(bitmap)
+            } catch (e: Exception) {
+                e.printStackTrace()
+                profileImage.setImageResource(R.drawable.profile_image)
+            }
         } else {
             profileImage.setImageResource(R.drawable.profile_image)
         }
@@ -123,6 +166,7 @@ class followings : AppCompatActivity() {
         followingList.clear()
         followingList.addAll(allFollowing)
         userAdapter.notifyDataSetChanged()
+        updateResultsCount()
     }
 
     private fun updateLastSyncDisplay() {

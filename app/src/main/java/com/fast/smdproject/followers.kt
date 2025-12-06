@@ -32,6 +32,7 @@ class followers : AppCompatActivity() {
     private lateinit var lastSync: TextView
     private lateinit var refreshText: TextView
     private lateinit var resultsCount: TextView
+    private lateinit var followingsTitle: TextView
     private val followersList = ArrayList<User>()
     private var allFollowers = ArrayList<User>()
 
@@ -44,6 +45,9 @@ class followers : AppCompatActivity() {
 
         // Setup RecyclerView
         setupRecyclerView()
+
+        // Setup bottom navigation
+        setupBottomNavigation()
 
         // Load user profile info
         loadUserProfileInfo()
@@ -66,6 +70,10 @@ class followers : AppCompatActivity() {
         lastSync = findViewById(R.id.lastSync)
         refreshText = findViewById(R.id.refreshText)
         resultsCount = findViewById(R.id.resultsCount)
+        followingsTitle = findViewById(R.id.followingsTitle)
+
+        // Set the title to "Followers"
+        followingsTitle.text = "Followers"
 
         val menuIcon = findViewById<ImageView>(R.id.menuIcon)
         val profileIcon = findViewById<ImageView>(R.id.profileIcon)
@@ -99,6 +107,38 @@ class followers : AppCompatActivity() {
         val ipAddress = getString(R.string.ipAddress)
         userAdapter = UserAdapter(this, followersList, ipAddress)
         recyclerView.adapter = userAdapter
+    }
+
+    private fun setupBottomNavigation() {
+        val bottomNav = findViewById<android.widget.LinearLayout>(R.id.bottomNavigation)
+
+        // Get all LinearLayouts (navigation items)
+        val navItems = mutableListOf<android.widget.LinearLayout>()
+        for (i in 0 until bottomNav.childCount) {
+            val child = bottomNav.getChildAt(i)
+            if (child is android.widget.LinearLayout) {
+                navItems.add(child)
+            }
+        }
+
+        // Setup click listeners (order: home, search, upload, lib, profile)
+        if (navItems.size >= 5) {
+            navItems[0].setOnClickListener {
+                startActivity(Intent(this, HomePage::class.java))
+            }
+            navItems[1].setOnClickListener {
+                startActivity(Intent(this, SearchUserActivity::class.java))
+            }
+            navItems[2].setOnClickListener {
+                startActivity(Intent(this, UploadRecipe::class.java))
+            }
+            navItems[3].setOnClickListener {
+                startActivity(Intent(this, DownloadsActivity::class.java))
+            }
+            navItems[4].setOnClickListener {
+                startActivity(Intent(this, UserProfileActivity::class.java))
+            }
+        }
     }
 
     private fun loadUserProfileInfo() {

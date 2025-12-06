@@ -51,12 +51,13 @@
         android:paddingBottom="16dp">
 
         <!-- Profile Image -->
-        <ImageView
+        <androidx.constraintlayout.utils.widget.ImageFilterView
             android:id="@+id/profileImage"
             android:layout_width="100dp"
             android:layout_height="100dp"
             android:background="@drawable/imgbackground"
-            android:scaleType="centerCrop" />
+            android:scaleType="centerCrop"
+            app:roundPercent="1" />
 
         <!-- Username -->
         <TextView
