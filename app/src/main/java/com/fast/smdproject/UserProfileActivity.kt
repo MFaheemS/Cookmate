@@ -14,6 +14,7 @@ import com.android.volley.Request
 import com.android.volley.toolbox.JsonObjectRequest
 import com.android.volley.toolbox.Volley
 import com.bumptech.glide.Glide
+import org.json.JSONArray
 import org.json.JSONException
 
 class UserProfileActivity : AppCompatActivity() {
@@ -25,7 +26,7 @@ class UserProfileActivity : AppCompatActivity() {
     private lateinit var tvUploadsCount: TextView
     private lateinit var recyclerViewRecipes: RecyclerView
     private lateinit var tvEmptyState: TextView
-    private lateinit var recipeAdapter: RecipeAdapter
+    private lateinit var recipeAdapter: ProfileRecipeAdapter
     private val recipeList = ArrayList<Recipe>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -69,7 +70,10 @@ class UserProfileActivity : AppCompatActivity() {
     private fun setupRecyclerView() {
         recyclerViewRecipes.layoutManager = GridLayoutManager(this, 2)
         val ipAddress = getString(R.string.ipAddress)
-        recipeAdapter = RecipeAdapter(this, recipeList, ipAddress)
+        recipeAdapter = ProfileRecipeAdapter(this, recipeList, ipAddress) {
+            // Refresh profile when a recipe is deleted
+            fetchUserProfile()
+        }
         recyclerViewRecipes.adapter = recipeAdapter
     }
 
@@ -151,12 +155,27 @@ class UserProfileActivity : AppCompatActivity() {
 
                             for (i in 0 until recipesArray.length()) {
                                 val obj = recipesArray.getJSONObject(i)
+
+                                // Parse images - extract first image as cover
+                                val imagesString = obj.getString("images")
+                                val coverImage = try {
+                                    val imagesArray = JSONArray(imagesString)
+                                    if (imagesArray.length() > 0) {
+                                        imagesArray.getString(0)
+                                    } else {
+                                        ""
+                                    }
+                                } catch (e: Exception) {
+                                    // Fallback for old single image format
+                                    imagesString
+                                }
+
                                 val recipe = Recipe(
                                     recipeId = obj.getInt("recipe_id"),
                                     title = obj.getString("title"),
                                     description = obj.getString("description"),
                                     tags = obj.getString("tags"),
-                                    imagePath = obj.getString("images")
+                                    imagePath = coverImage
                                 )
                                 recipeList.add(recipe)
                             }

@@ -117,6 +117,7 @@ class DownloadRecipeAdapter(
             val intent = Intent(context, SetTimerActivity::class.java)
             intent.putExtra("RECIPE_ID", recipe.recipeId)
             intent.putExtra("RECIPE_TITLE", recipe.title)
+            intent.putExtra("RECIPE_IMAGE", recipe.imagePath)
             context.startActivity(intent)
         }
 

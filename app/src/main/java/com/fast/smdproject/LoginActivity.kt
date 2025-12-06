@@ -101,6 +101,9 @@ class LoginActivity : AppCompatActivity() {
                                         val db = UserDatabase(this)
                                         db.saveUser(userId, usernameResp, firstName, lastName, email, imageBase64)
 
+                                        // Initialize FCM after login
+                                        FCMHelper.sendPendingToken(this)
+
                                         Toast.makeText(this, "Login successful.", Toast.LENGTH_SHORT).show()
                                         startActivity(Intent(this, HomePage::class.java))
                                         finish()
@@ -110,6 +113,10 @@ class LoginActivity : AppCompatActivity() {
 
                                         val db = UserDatabase(this)
                                         db.saveUser(userId, usernameResp, firstName, lastName, email, null)
+
+                                        // Initialize FCM after login
+                                        FCMHelper.sendPendingToken(this)
+
                                         Toast.makeText(this, "Login successful (image not loaded).", Toast.LENGTH_SHORT).show()
                                         startActivity(Intent(this, HomePage::class.java))
                                         finish()
@@ -120,6 +127,10 @@ class LoginActivity : AppCompatActivity() {
 
                                 val db = UserDatabase(this)
                                 db.saveUser(userId, usernameResp, firstName, lastName, email, null)
+
+                                // Initialize FCM after login
+                                FCMHelper.sendPendingToken(this)
+
                                 Toast.makeText(this, "Login successful.", Toast.LENGTH_SHORT).show()
                                 startActivity(Intent(this, HomePage::class.java))
                                 finish()

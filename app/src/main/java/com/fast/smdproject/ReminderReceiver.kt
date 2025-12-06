@@ -32,12 +32,14 @@ class ReminderReceiver : BroadcastReceiver() {
                 NotificationManager.IMPORTANCE_HIGH
             ).apply {
                 description = "Notifications for recipe cooking reminders"
+                enableVibration(true)
+                enableLights(true)
             }
             notificationManager.createNotificationChannel(channel)
         }
 
-        // Intent to open the app when notification is clicked
-        val notificationIntent = Intent(context, DownloadsActivity::class.java).apply {
+        // Intent to open the reminder activity
+        val notificationIntent = Intent(context, ReminderActivity::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
         }
 
@@ -51,11 +53,15 @@ class ReminderReceiver : BroadcastReceiver() {
         // Build the notification
         val notification = NotificationCompat.Builder(context, channelId)
             .setSmallIcon(R.drawable.grass)
-            .setContentTitle("Time to cook!")
+            .setContentTitle("⏰ Time to cook!")
             .setContentText("It's time to prepare $recipeTitle")
+            .setStyle(NotificationCompat.BigTextStyle()
+                .bigText("It's time to prepare $recipeTitle. Check your reminder for details!"))
             .setPriority(NotificationCompat.PRIORITY_HIGH)
+            .setCategory(NotificationCompat.CATEGORY_REMINDER)
             .setAutoCancel(true)
             .setContentIntent(pendingIntent)
+            .setVibrate(longArrayOf(1000, 1000, 1000))
             .build()
 
         notificationManager.notify(recipeId, notification)

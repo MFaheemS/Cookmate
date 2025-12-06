@@ -55,12 +55,24 @@
         <activity
             android:name=".reminder"
             android:exported="false" />
+        <activity
+            android:name=".ReminderActivity"
+            android:exported="false" />
 
         <!-- Broadcast Receiver for Reminders -->
         <receiver
             android:name=".ReminderReceiver"
             android:enabled="true"
             android:exported="false" />
+
+        <!-- FCM Service -->
+        <service
+            android:name=".FCMService"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
+            </intent-filter>
+        </service>
 
         <activity
             android:name=".editRecipe"

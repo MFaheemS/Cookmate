@@ -16,17 +16,15 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <!-- Hero Image Section -->
+            <!-- Hero Image Section with Gallery -->
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="280dp">
 
-                <ImageView
-                    android:id="@+id/recipe_image"
+                <androidx.viewpager2.widget.ViewPager2
+                    android:id="@+id/image_gallery"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:src="@drawable/biryani"
-                    android:scaleType="centerCrop" />
+                    android:layout_height="match_parent" />
 
                 <View
                     android:layout_width="match_parent"
@@ -39,7 +37,22 @@
                     android:layout_height="40dp"
                     android:src="@drawable/ic_back"
                     android:layout_margin="16dp"
-                    android:padding="8dp" />
+                    android:padding="8dp"
+                    android:contentDescription="Back button" />
+
+                <!-- Image Counter Indicator -->
+                <TextView
+                    android:id="@+id/image_counter"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentEnd="true"
+                    android:layout_margin="16dp"
+                    android:text="1/3"
+                    android:textColor="#FFFFFF"
+                    android:textSize="14sp"
+                    android:background="#80000000"
+                    android:padding="8dp"
+                    android:visibility="gone" />
 
                 <!-- Title and Stats -->
                 <LinearLayout
@@ -58,19 +71,50 @@
                         android:textSize="24sp"
                         android:textStyle="bold" />
 
-                    <!-- Static Stats for now -->
+                    <!-- Stats with clickable icons -->
                     <LinearLayout
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:orientation="horizontal"
                         android:layout_marginTop="8dp"
                         android:gravity="center_vertical">
-                        <ImageView android:layout_width="20dp" android:layout_height="20dp" android:src="@drawable/hearts" />
-                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="" android:textColor="#FFFFFF" android:textSize="14sp" android:layout_marginLeft="4dp" android:layout_marginRight="16dp"
-                            android:id="@+id/favCounter"/>
-                        <ImageView android:layout_width="20dp" android:layout_height="20dp" android:src="@drawable/ic_download" />
-                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="" android:textColor="#FFFFFF" android:textSize="14sp" android:layout_marginLeft="4dp"
-                            android:id="@+id/downloadCounter"/>
+
+                        <ImageView
+                            android:id="@+id/icon_like_detail"
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:src="@drawable/ic_like"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:contentDescription="Like recipe" />
+
+                        <TextView
+                            android:id="@+id/favCounter"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="0"
+                            android:textColor="#FFFFFF"
+                            android:textSize="14sp"
+                            android:layout_marginLeft="4dp"
+                            android:layout_marginRight="16dp" />
+
+                        <ImageView
+                            android:id="@+id/icon_download_detail"
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:src="@drawable/ic_download"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:contentDescription="Download recipe" />
+
+                        <TextView
+                            android:id="@+id/downloadCounter"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="0"
+                            android:textColor="#FFFFFF"
+                            android:textSize="14sp"
+                            android:layout_marginLeft="4dp" />
                     </LinearLayout>
                 </LinearLayout>
             </RelativeLayout>

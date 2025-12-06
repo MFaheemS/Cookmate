@@ -12,6 +12,7 @@ import com.android.volley.Request
 import com.android.volley.toolbox.JsonObjectRequest
 import com.android.volley.toolbox.Volley
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import org.json.JSONArray
 import org.json.JSONException
 
 class DownloadsActivity : AppCompatActivity() {
@@ -51,7 +52,7 @@ class DownloadsActivity : AppCompatActivity() {
             startActivity(Intent(this, UserProfileActivity::class.java))
         }
         fabReminders.setOnClickListener {
-            startActivity(Intent(this, reminder::class.java))
+            startActivity(Intent(this, ReminderActivity::class.java))
         }
     }
 
@@ -78,12 +79,26 @@ class DownloadsActivity : AppCompatActivity() {
                         for (i in 0 until jsonArray.length()) {
                             val obj = jsonArray.getJSONObject(i)
                             val recipeId = obj.getInt("recipe_id")
+
+                            // Parse images - extract first image as cover
+                            val imagesString = obj.getString("images")
+                            val coverImage = try {
+                                val imagesArray = JSONArray(imagesString)
+                                if (imagesArray.length() > 0) {
+                                    imagesArray.getString(0)
+                                } else {
+                                    ""
+                                }
+                            } catch (e: Exception) {
+                                imagesString
+                            }
+
                             val recipe = Recipe(
                                 recipeId = recipeId,
                                 title = obj.getString("title"),
                                 description = obj.getString("description"),
                                 tags = obj.getString("tags"),
-                                imagePath = obj.getString("images"),
+                                imagePath = coverImage,
                                 likeCount = obj.getInt("like_count"),
                                 downloadCount = obj.getInt("download_count"),
                                 isLiked = obj.getBoolean("is_liked"),

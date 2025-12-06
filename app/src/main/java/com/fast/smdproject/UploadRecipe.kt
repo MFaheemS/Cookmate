@@ -6,10 +6,11 @@ import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
 import android.util.Base64
-import android.view.View
 import android.widget.*
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.android.volley.DefaultRetryPolicy
 import com.android.volley.Request
 import com.android.volley.toolbox.StringRequest
@@ -21,7 +22,6 @@ import java.util.UUID
 
 class UploadRecipe : AppCompatActivity() {
 
-
     private lateinit var etTitle: EditText
     private lateinit var etTags: EditText
     private lateinit var etFirstStep: EditText
@@ -29,27 +29,24 @@ class UploadRecipe : AppCompatActivity() {
     private lateinit var btnUpload: Button
     private lateinit var ingredientsContainer: LinearLayout
     private lateinit var btnBack: ImageView
-
-    // Single Image UI
-    private lateinit var imgRecipePreview: ImageView
-    private lateinit var txtTapHint: TextView
-    private lateinit var btnRemoveImage: ImageView
-
-    // Data Variables
-    private var selectedImageBitmap: Bitmap? = null
-
+    private lateinit var btnAddImage: Button
+    private lateinit var recyclerImages: RecyclerView
     private lateinit var description: EditText
+
+    // Multiple Images
+    private val selectedImages = mutableListOf<Bitmap>()
+    private lateinit var imagePreviewAdapter: ImagePreviewAdapter
 
     // Image Picker
     private val pickImageLauncher = registerForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
         if (uri != null) {
             try {
-                // Convert Uri to Bitmap immediately
                 val bitmap = MediaStore.Images.Media.getBitmap(contentResolver, uri)
-                selectedImageBitmap = bitmap
-                updateImageUI()
+                selectedImages.add(bitmap)
+                imagePreviewAdapter.notifyDataSetChanged()
             } catch (e: Exception) {
                 e.printStackTrace()
+                Toast.makeText(this, "Failed to load image", Toast.LENGTH_SHORT).show()
             }
         }
     }
@@ -66,23 +63,22 @@ class UploadRecipe : AppCompatActivity() {
         btnUpload = findViewById(R.id.btn_upload)
         ingredientsContainer = findViewById(R.id.ingredients_container)
         btnBack = findViewById(R.id.btn_back)
-
-        imgRecipePreview = findViewById(R.id.img_recipe_preview)
-        txtTapHint = findViewById(R.id.txt_tap_hint)
-        btnRemoveImage = findViewById(R.id.btn_remove_image)
-
+        btnAddImage = findViewById(R.id.btn_add_image)
+        recyclerImages = findViewById(R.id.recycler_images)
         description = findViewById(R.id.description)
+
+        // Setup RecyclerView for images
+        setupImageRecyclerView()
 
         // Listeners
         btnBack.setOnClickListener { finish() }
 
-        imgRecipePreview.setOnClickListener {
-            pickImageLauncher.launch("image/*")
-        }
-
-        btnRemoveImage.setOnClickListener {
-            selectedImageBitmap = null
-            updateImageUI()
+        btnAddImage.setOnClickListener {
+            if (selectedImages.size < 5) {
+                pickImageLauncher.launch("image/*")
+            } else {
+                Toast.makeText(this, "Maximum 5 images allowed", Toast.LENGTH_SHORT).show()
+            }
         }
 
         btnAddIngredient.setOnClickListener {
@@ -94,16 +90,13 @@ class UploadRecipe : AppCompatActivity() {
         }
     }
 
-    private fun updateImageUI() {
-        if (selectedImageBitmap != null) {
-            imgRecipePreview.setImageBitmap(selectedImageBitmap)
-            txtTapHint.visibility = View.GONE
-            btnRemoveImage.visibility = View.VISIBLE
-        } else {
-            imgRecipePreview.setImageResource(R.drawable.biryani) // Your placeholder
-            txtTapHint.visibility = View.VISIBLE
-            btnRemoveImage.visibility = View.GONE
+    private fun setupImageRecyclerView() {
+        recyclerImages.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
+        imagePreviewAdapter = ImagePreviewAdapter(selectedImages) { position ->
+            selectedImages.removeAt(position)
+            imagePreviewAdapter.notifyDataSetChanged()
         }
+        recyclerImages.adapter = imagePreviewAdapter
     }
 
     private fun addIngredientRow() {
@@ -120,20 +113,22 @@ class UploadRecipe : AppCompatActivity() {
         val db = UserDatabase(this)
         val currentUsername = db.getUsername() ?: return
         val uniqueId = UUID.randomUUID().toString()
-        val imageBase64 = if (selectedImageBitmap != null) bitmapToBase64(selectedImageBitmap!!) else ""
 
         if (currentUsername.isNullOrEmpty()) {
             Toast.makeText(this, "User not logged in!", Toast.LENGTH_SHORT).show()
             return
         }
 
-
-
         val ipAddress = getString(R.string.ipAddress)
         val url = "http://$ipAddress/cookMate/uploadRecipe.php"
 
         if (title.isEmpty()) {
             Toast.makeText(this, "Title is required", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        if (selectedImages.isEmpty()) {
+            Toast.makeText(this, "Please add at least one image", Toast.LENGTH_SHORT).show()
             return
         }
 
@@ -204,8 +199,13 @@ class UploadRecipe : AppCompatActivity() {
                     params["steps"] = finalStepsJson
                     params["description"] = desc
 
-                    if (selectedImageBitmap != null) {
-                        params["image"] = bitmapToBase64(selectedImageBitmap!!)
+                    // Convert multiple images to JSON array of base64 strings
+                    if (selectedImages.isNotEmpty()) {
+                        val imagesArray = JSONArray()
+                        for (bitmap in selectedImages) {
+                            imagesArray.put(bitmapToBase64(bitmap))
+                        }
+                        params["images"] = imagesArray.toString()
                     }
 
                     return params
@@ -222,6 +222,12 @@ class UploadRecipe : AppCompatActivity() {
         }
 
         else{
+            // For offline save, convert first image to base64
+            val imageBase64 = if (selectedImages.isNotEmpty()) {
+                bitmapToBase64(selectedImages[0])
+            } else {
+                ""
+            }
 
             db.savePendingRecipe(
                 uniqueId, currentUsername, title, desc,

@@ -79,55 +79,34 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:layout_marginBottom="24dp"
-                android:gravity="center">
+                android:layout_marginBottom="24dp">
 
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Recipe Photo"
+                    android:text="Upload Images"
                     android:textColor="#333333"
                     android:textSize="14sp"
                     android:textStyle="bold"
                     android:layout_marginBottom="12dp"
                     android:gravity="start"/>
 
-                <FrameLayout
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/recycler_images"
                     android:layout_width="match_parent"
-                    android:layout_height="200dp"
-                    android:background="#F5F5F5">
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginBottom="12dp"/>
 
-                    <ImageView
-                        android:id="@+id/img_recipe_preview"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:scaleType="centerCrop"
-                        android:src="@drawable/biryani"
-                        android:contentDescription="Recipe Preview" />
-
-                    <TextView
-                        android:id="@+id/txt_tap_hint"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Tap to add photo"
-                        android:textColor="#FFFFFF"
-                        android:textSize="16sp"
-                        android:textStyle="bold"
-                        android:background="#80000000"
-                        android:padding="12dp"
-                        android:layout_gravity="center"/>
-
-                    <ImageView
-                        android:id="@+id/btn_remove_image"
-                        android:layout_width="32dp"
-                        android:layout_height="32dp"
-                        android:src="@drawable/close"
-                        android:background="#FFFFFF"
-                        android:padding="4dp"
-                        android:layout_gravity="top|end"
-                        android:layout_margin="8dp"
-                        android:visibility="gone"/>
-                </FrameLayout>
+                <Button
+                    android:id="@+id/btn_add_image"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Add Image"
+                    android:textColor="#FFFFFF"
+                    android:background="#8BC34A"
+                    android:textAllCaps="false"
+                    android:padding="12dp"/>
             </LinearLayout>
 
             <LinearLayout

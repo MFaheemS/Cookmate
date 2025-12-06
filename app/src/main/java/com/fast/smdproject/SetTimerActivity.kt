@@ -9,6 +9,10 @@ import android.widget.Button
 import android.widget.NumberPicker
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import com.android.volley.Response
+import com.android.volley.toolbox.StringRequest
+import com.android.volley.toolbox.Volley
+import org.json.JSONObject
 import java.util.*
 
 class SetTimerActivity : AppCompatActivity() {
@@ -20,6 +24,7 @@ class SetTimerActivity : AppCompatActivity() {
 
     private var recipeId: Int = 0
     private var recipeTitle: String = ""
+    private var recipeImage: String = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -28,6 +33,7 @@ class SetTimerActivity : AppCompatActivity() {
         // Get recipe details from intent
         recipeId = intent.getIntExtra("RECIPE_ID", 0)
         recipeTitle = intent.getStringExtra("RECIPE_TITLE") ?: ""
+        recipeImage = intent.getStringExtra("RECIPE_IMAGE") ?: ""
 
         // Initialize views
         hourPicker = findViewById(R.id.hourPicker)
@@ -141,10 +147,56 @@ class SetTimerActivity : AppCompatActivity() {
         val sharedPrefs = getSharedPreferences("Reminders", MODE_PRIVATE)
         val editor = sharedPrefs.edit()
 
-        // Store reminder with recipe ID as key
+        // Store reminder locally in SharedPreferences
         editor.putLong("reminder_$recipeId", timeInMillis)
         editor.putString("reminder_title_$recipeId", recipeTitle)
+        editor.putString("reminder_image_$recipeId", recipeImage)
         editor.apply()
+
+        // Sync with database
+        syncReminderToDatabase(timeInMillis)
+    }
+
+    private fun syncReminderToDatabase(timeInMillis: Long) {
+        val db = UserDatabase(this)
+        val userId = db.getCurrentUserId()
+
+        if (userId == 0) {
+            return
+        }
+
+        val ipAddress = getString(R.string.ipAddress)
+        val url = "http://$ipAddress/cookMate/save_reminder.php"
+
+        val request = object : com.android.volley.toolbox.StringRequest(
+            Method.POST,
+            url,
+            Response.Listener { response ->
+                try {
+                    val json = JSONObject(response)
+                    if (json.getString("status") == "success") {
+                        // Successfully synced to database
+                        Toast.makeText(this, "Reminder saved", Toast.LENGTH_SHORT).show()
+                    }
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                }
+            },
+            Response.ErrorListener { error ->
+                // Failed to sync, but local storage still works
+                Toast.makeText(this, "Reminder saved locally", Toast.LENGTH_SHORT).show()
+            }
+        ) {
+            override fun getParams(): MutableMap<String, String> {
+                val params = HashMap<String, String>()
+                params["user_id"] = userId.toString()
+                params["recipe_id"] = recipeId.toString()
+                params["reminder_time"] = timeInMillis.toString()
+                return params
+            }
+        }
+
+        Volley.newRequestQueue(this).add(request)
     }
 }
 

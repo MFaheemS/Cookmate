@@ -1,6 +1,7 @@
 <?php
 header('Content-Type: application/json; charset=utf-8');
 require 'db_connect.php';
+require_once 'send_notification.php';
 
 if ($_SERVER['REQUEST_METHOD'] != 'POST') {
     echo json_encode(["status" => "error", "message" => "Invalid Request Method"]);
@@ -41,31 +42,46 @@ if (!$user_id) {
     exit();
 }
 
-// 3. HANDLE IMAGE (Keep your existing Base64 logic here)
-$image_path = "";
-if (isset($_POST['image']) && !empty($_POST['image'])) {
-    // ... (Keep your existing Base64 decode and save logic) ...
-    // ... copy paste the logic from previous steps ...
-    $base64_string = $_POST['image'];
-    $target_dir = "media_uploads/";
-    if (!file_exists($target_dir)) { mkdir($target_dir, 0777, true); }
-    $image_data = base64_decode($base64_string);
-    if ($image_data !== false) {
-        $new_file_name = uniqid("img_", true) . ".jpg";
-        $target_file = $target_dir . $new_file_name;
-        if (file_put_contents($target_file, $image_data)) {
-            $image_path = $target_file;
+// 3. HANDLE IMAGES (Multiple images support)
+$image_paths = array();
+if (isset($_POST['images']) && !empty($_POST['images'])) {
+    $images_json = $_POST['images'];
+    $images_array = json_decode($images_json, true);
+
+    if (is_array($images_array)) {
+        $target_dir = "media_uploads/";
+        if (!file_exists($target_dir)) {
+            mkdir($target_dir, 0777, true);
+        }
+
+        foreach ($images_array as $base64_string) {
+            $image_data = base64_decode($base64_string);
+            if ($image_data !== false) {
+                $new_file_name = uniqid("img_", true) . ".jpg";
+                $target_file = $target_dir . $new_file_name;
+                if (file_put_contents($target_file, $image_data)) {
+                    $image_paths[] = $target_file;
+                }
+            }
         }
     }
 }
+
+// Convert image paths array to JSON string for storage
+$images_json_storage = json_encode($image_paths);
 
 // 4. INSERT RECIPE (Using the found $user_id)
 $stmt = $conn->prepare("INSERT INTO Recipes (unique_id, user_id, title, ingredients, steps, tags, images, description) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
 
 if ($stmt) {
     // Note: We use the $user_id we found in step 2
-    $stmt->bind_param("sissssss", $unique_id, $user_id, $title, $ingredients, $steps, $tags, $image_path, $description);
+    $stmt->bind_param("sissssss", $unique_id, $user_id, $title, $ingredients, $steps, $tags, $images_json_storage, $description);
     if ($stmt->execute()) {
+        $recipe_id = $conn->insert_id;
+
+        // Send notification to all followers about new recipe
+        notifyFollowersAboutNewRecipe($user_id, $recipe_id, $title);
+
         echo json_encode(["status" => "success", "message" => "Recipe Uploaded"]);
     } else {
         echo json_encode(["status" => "error", "message" => "SQL Error: " . $stmt->error]);

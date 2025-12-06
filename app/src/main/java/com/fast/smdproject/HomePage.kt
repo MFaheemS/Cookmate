@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.android.volley.Request
 import com.android.volley.toolbox.JsonObjectRequest
 import com.android.volley.toolbox.Volley
+import org.json.JSONArray
 import org.json.JSONException
 
 class HomePage : AppCompatActivity() {
@@ -22,6 +23,9 @@ class HomePage : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_home_page)
+
+        // Check for new notifications
+        checkForNotifications()
 
         // Bottom Nav Setup
         val btnSearch = findViewById<ImageView>(R.id.search)
@@ -65,12 +69,26 @@ class HomePage : AppCompatActivity() {
                         for (i in 0 until jsonArray.length()) {
                             val obj = jsonArray.getJSONObject(i)
 
+                            // Parse images - extract first image as cover
+                            val imagesString = obj.getString("images")
+                            val coverImage = try {
+                                val imagesArray = JSONArray(imagesString)
+                                if (imagesArray.length() > 0) {
+                                    imagesArray.getString(0)
+                                } else {
+                                    ""
+                                }
+                            } catch (e: Exception) {
+                                // Fallback for old single image format
+                                imagesString
+                            }
+
                             val recipe = Recipe(
                                 recipeId = obj.getInt("recipe_id"),
                                 title = obj.getString("title"),
                                 description = obj.getString("description"),
                                 tags = obj.getString("tags"),
-                                imagePath = obj.getString("images"),
+                                imagePath = coverImage,
                                 likeCount = obj.optInt("like_count", 0),
                                 downloadCount = obj.optInt("download_count", 0),
                                 isLiked = obj.optBoolean("is_liked", false),
@@ -93,6 +111,73 @@ class HomePage : AppCompatActivity() {
             },
             { error ->
                 Toast.makeText(this, "Network Error: ${error.message}", Toast.LENGTH_SHORT).show()
+            }
+        )
+
+        Volley.newRequestQueue(this).add(request)
+    }
+
+    private fun checkForNotifications() {
+        val db = UserDatabase(this)
+        val userId = db.getCurrentUserId()
+
+        if (userId == 0) return
+
+        val prefs = getSharedPreferences("Notifications", MODE_PRIVATE)
+        val lastCheck = prefs.getString("last_notification_check", "")
+
+        val ipAddress = getString(R.string.ipAddress)
+        val url = if (lastCheck.isNullOrEmpty()) {
+            "http://$ipAddress/cookMate/get_notifications.php?user_id=$userId"
+        } else {
+            "http://$ipAddress/cookMate/get_notifications.php?user_id=$userId&last_check=$lastCheck"
+        }
+
+        val request = JsonObjectRequest(
+            Request.Method.GET,
+            url,
+            null,
+            { response ->
+                try {
+                    if (response.getString("status") == "success") {
+                        val notifications = response.getJSONArray("notifications")
+
+                        for (i in 0 until notifications.length()) {
+                            val notif = notifications.getJSONObject(i)
+                            val type = notif.getString("type")
+
+                            when (type) {
+                                "new_follower" -> {
+                                    val username = notif.getString("username")
+                                    NotificationHelper.showFollowerNotification(this, username)
+                                }
+                                "new_recipe" -> {
+                                    val recipeTitle = notif.getString("recipe_title")
+                                    val authorUsername = notif.getString("author_username")
+                                    val recipeId = notif.getInt("recipe_id")
+                                    NotificationHelper.showNewRecipeNotification(
+                                        this,
+                                        authorUsername,
+                                        recipeTitle,
+                                        recipeId
+                                    )
+                                }
+                            }
+                        }
+
+                        // Update last check timestamp
+                        val currentTime = java.text.SimpleDateFormat(
+                            "yyyy-MM-dd HH:mm:ss",
+                            java.util.Locale.getDefault()
+                        ).format(java.util.Date())
+                        prefs.edit().putString("last_notification_check", currentTime).apply()
+                    }
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                }
+            },
+            { error ->
+                // Silently fail - notifications are not critical
             }
         )
 
