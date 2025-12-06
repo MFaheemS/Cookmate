@@ -185,16 +185,6 @@
                     android:background="@color/white"
                     android:layout_marginLeft="10dp"/>
 
-                <ImageButton
-                    android:id="@+id/timerButton"
-                    android:layout_width="20dp"
-                    android:layout_height="20dp"
-                    app:layout_constraintStart_toStartOf="@id/likeButton"
-                    app:layout_constraintTop_toBottomOf="@id/likeButton"
-                    android:src="@drawable/ic_timer"
-                    android:background="@color/white"
-                    android:layout_marginTop="10dp"/>
-
             </androidx.constraintlayout.widget.ConstraintLayout>
 
 

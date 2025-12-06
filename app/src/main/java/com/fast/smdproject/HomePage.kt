@@ -49,8 +49,11 @@ class HomePage : AppCompatActivity() {
     }
 
     private fun fetchRecipes() {
+        val db = UserDatabase(this)
+        val userId = db.getCurrentUserId()
+
         val ipAddress = getString(R.string.ipAddress)
-        val url = "http://$ipAddress/cookMate/get_all_recipes.php"
+        val url = "http://$ipAddress/cookMate/get_all_recipes.php?user_id=$userId"
 
         val request = JsonObjectRequest(Request.Method.GET, url, null,
             { response ->
@@ -67,7 +70,12 @@ class HomePage : AppCompatActivity() {
                                 title = obj.getString("title"),
                                 description = obj.getString("description"),
                                 tags = obj.getString("tags"),
-                                imagePath = obj.getString("images") // This gets "media_uploads/..."
+                                imagePath = obj.getString("images"),
+                                likeCount = obj.optInt("like_count", 0),
+                                downloadCount = obj.optInt("download_count", 0),
+                                isLiked = obj.optBoolean("is_liked", false),
+                                isDownloaded = obj.optBoolean("is_downloaded", false),
+                                ownerId = obj.optInt("user_id", 0)
                             )
                             recipeList.add(recipe)
                         }

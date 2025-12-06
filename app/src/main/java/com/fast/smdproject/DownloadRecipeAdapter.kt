@@ -12,38 +12,43 @@ import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
-import com.android.volley.Request
 import com.android.volley.Response
 import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
 import com.bumptech.glide.Glide
 import org.json.JSONObject
+import java.text.SimpleDateFormat
+import java.util.*
+import java.util.concurrent.TimeUnit
 
-class RecipeAdapter(
+class DownloadRecipeAdapter(
     private val context: Context,
     private val recipeList: List<Recipe>,
-    private val ipAddress: String
-) : RecyclerView.Adapter<RecipeAdapter.RecipeViewHolder>() {
+    private val ipAddress: String,
+    private val downloadTimes: Map<Int, String> = emptyMap()
+) : RecyclerView.Adapter<DownloadRecipeAdapter.DownloadViewHolder>() {
 
-    class RecipeViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+    class DownloadViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val imgRecipe: ImageView = itemView.findViewById(R.id.item_image)
         val txtTitle: TextView = itemView.findViewById(R.id.item_title)
         val txtTags: TextView = itemView.findViewById(R.id.item_tags)
         val txtDesc: TextView = itemView.findViewById(R.id.item_desc)
         val txtLikeCount: TextView = itemView.findViewById(R.id.like_count)
         val txtDownloadCount: TextView = itemView.findViewById(R.id.download_count)
+        val txtDownloadTime: TextView = itemView.findViewById(R.id.download_time)
         val iconLike: ImageView = itemView.findViewById(R.id.icon_like)
         val iconDownload: ImageView = itemView.findViewById(R.id.icon_download)
+        val iconClock: ImageView = itemView.findViewById(R.id.icon_clock)
         val btnDetails: Button = itemView.findViewById(R.id.btn_details)
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecipeViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DownloadViewHolder {
         val view = LayoutInflater.from(parent.context)
-            .inflate(R.layout.item_recipe_card, parent, false)
-        return RecipeViewHolder(view)
+            .inflate(R.layout.item_download_card, parent, false)
+        return DownloadViewHolder(view)
     }
 
-    override fun onBindViewHolder(holder: RecipeViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: DownloadViewHolder, position: Int) {
         val recipe = recipeList[position]
 
         val db = UserDatabase(context)
@@ -55,6 +60,14 @@ class RecipeAdapter(
         holder.txtDesc.text = recipe.description
         holder.txtLikeCount.text = recipe.likeCount.toString()
         holder.txtDownloadCount.text = recipe.downloadCount.toString()
+
+        // Calculate and display time since download
+        val downloadTime = downloadTimes[recipe.recipeId]
+        if (downloadTime != null) {
+            holder.txtDownloadTime.text = getTimeAgo(downloadTime)
+        } else {
+            holder.txtDownloadTime.text = "Now"
+        }
 
         // Set initial icon states
         updateLikeIcon(holder.iconLike, recipe.isLiked)
@@ -104,11 +117,28 @@ class RecipeAdapter(
             intent.putExtra("RECIPE_ID", recipe.recipeId)
             context.startActivity(intent)
         }
-
-        holder.itemView.setOnClickListener(null)
     }
 
-    private fun toggleLike(recipe: Recipe, holder: RecipeViewHolder) {
+    private fun getTimeAgo(timestamp: String): String {
+        try {
+            val sdf = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
+            val date = sdf.parse(timestamp)
+            val now = Date()
+            val diff = now.time - (date?.time ?: 0)
+
+            return when {
+                diff < TimeUnit.MINUTES.toMillis(1) -> "Now"
+                diff < TimeUnit.HOURS.toMillis(1) -> "${TimeUnit.MILLISECONDS.toMinutes(diff)}m"
+                diff < TimeUnit.DAYS.toMillis(1) -> "${TimeUnit.MILLISECONDS.toHours(diff)}h"
+                diff < TimeUnit.DAYS.toMillis(7) -> "${TimeUnit.MILLISECONDS.toDays(diff)}d"
+                else -> "${TimeUnit.MILLISECONDS.toDays(diff) / 7}w"
+            }
+        } catch (e: Exception) {
+            return "Now"
+        }
+    }
+
+    private fun toggleLike(recipe: Recipe, holder: DownloadViewHolder) {
         val db = UserDatabase(context)
         val userId = db.getCurrentUserId()
 
@@ -129,22 +159,16 @@ class RecipeAdapter(
                         recipe.isLiked = !recipe.isLiked
                         recipe.likeCount = json.getInt("like_count")
 
-                        // Animate and update UI
                         animateIconChange(holder.iconLike) {
                             updateLikeIcon(holder.iconLike, recipe.isLiked)
                         }
                         holder.txtLikeCount.text = recipe.likeCount.toString()
-                    } else {
-                        Toast.makeText(context, json.getString("message"), Toast.LENGTH_SHORT).show()
                     }
                 } catch (e: Exception) {
                     e.printStackTrace()
-                    Toast.makeText(context, "Error: ${e.message}", Toast.LENGTH_SHORT).show()
                 }
             },
-            Response.ErrorListener { error ->
-                Toast.makeText(context, "Network Error", Toast.LENGTH_SHORT).show()
-            }
+            Response.ErrorListener { }
         ) {
             override fun getParams(): MutableMap<String, String> {
                 val params = HashMap<String, String>()
@@ -157,7 +181,7 @@ class RecipeAdapter(
         Volley.newRequestQueue(context).add(request)
     }
 
-    private fun toggleDownload(recipe: Recipe, holder: RecipeViewHolder) {
+    private fun toggleDownload(recipe: Recipe, holder: DownloadViewHolder) {
         val db = UserDatabase(context)
         val userId = db.getCurrentUserId()
 
@@ -178,22 +202,16 @@ class RecipeAdapter(
                         recipe.isDownloaded = !recipe.isDownloaded
                         recipe.downloadCount = json.getInt("download_count")
 
-                        // Animate and update UI
                         animateIconChange(holder.iconDownload) {
                             updateDownloadIcon(holder.iconDownload, recipe.isDownloaded)
                         }
                         holder.txtDownloadCount.text = recipe.downloadCount.toString()
-                    } else {
-                        Toast.makeText(context, json.getString("message"), Toast.LENGTH_SHORT).show()
                     }
                 } catch (e: Exception) {
                     e.printStackTrace()
-                    Toast.makeText(context, "Error: ${e.message}", Toast.LENGTH_SHORT).show()
                 }
             },
-            Response.ErrorListener { error ->
-                Toast.makeText(context, "Network Error", Toast.LENGTH_SHORT).show()
-            }
+            Response.ErrorListener { }
         ) {
             override fun getParams(): MutableMap<String, String> {
                 val params = HashMap<String, String>()
@@ -207,7 +225,6 @@ class RecipeAdapter(
     }
 
     private fun animateIconChange(icon: ImageView, onComplete: () -> Unit) {
-        // Fade out
         val fadeOut = ObjectAnimator.ofFloat(icon, "alpha", 1f, 0f)
         fadeOut.duration = 150
         fadeOut.interpolator = AccelerateDecelerateInterpolator()
@@ -216,7 +233,6 @@ class RecipeAdapter(
             override fun onAnimationStart(animation: android.animation.Animator) {}
             override fun onAnimationEnd(animation: android.animation.Animator) {
                 onComplete()
-                // Fade in
                 val fadeIn = ObjectAnimator.ofFloat(icon, "alpha", 0f, 1f)
                 fadeIn.duration = 150
                 fadeIn.interpolator = AccelerateDecelerateInterpolator()

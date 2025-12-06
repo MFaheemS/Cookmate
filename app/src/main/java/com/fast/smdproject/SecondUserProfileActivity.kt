@@ -155,9 +155,6 @@ class SecondUserProfileActivity : AppCompatActivity() {
                                 .into(ivProfile)
                         }
 
-                        // Update follow button text
-                        val followButtonText = findViewById<TextView>(R.id.followButtonText)
-                        followButtonText.text = "Follow $usernameText"
 
                         // Load recipes
                         val recipesArray = userData.getJSONArray("recipes")
