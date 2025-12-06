@@ -1,9 +1,11 @@
 package com.fast.smdproject
 
 import android.content.Intent
+import android.graphics.BitmapFactory
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.Base64
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.TextView
@@ -29,6 +31,7 @@ class followers : AppCompatActivity() {
     private lateinit var username: TextView
     private lateinit var lastSync: TextView
     private lateinit var refreshText: TextView
+    private lateinit var resultsCount: TextView
     private val followersList = ArrayList<User>()
     private var allFollowers = ArrayList<User>()
 
@@ -62,6 +65,7 @@ class followers : AppCompatActivity() {
         username = findViewById(R.id.username)
         lastSync = findViewById(R.id.lastSync)
         refreshText = findViewById(R.id.refreshText)
+        resultsCount = findViewById(R.id.resultsCount)
 
         val menuIcon = findViewById<ImageView>(R.id.menuIcon)
         val profileIcon = findViewById<ImageView>(R.id.profileIcon)
@@ -103,15 +107,17 @@ class followers : AppCompatActivity() {
 
         username.text = userInfo["username"] ?: "User"
 
-        val profileImagePath = userInfo["profile_image"] ?: ""
-        if (profileImagePath.isNotEmpty() && profileImagePath != "null") {
-            val ipAddress = getString(R.string.ipAddress)
-            val imageUrl = "http://$ipAddress/cookMate/$profileImagePath"
-            Glide.with(this)
-                .load(imageUrl)
-                .placeholder(R.drawable.profile_image)
-                .error(R.drawable.profile_image)
-                .into(profileImage)
+        val profileImageBase64 = userInfo["profile_image"] ?: ""
+        if (profileImageBase64.isNotEmpty() && profileImageBase64 != "null") {
+            try {
+                // Decode base64 string to bitmap
+                val decodedBytes = Base64.decode(profileImageBase64, Base64.DEFAULT)
+                val bitmap = BitmapFactory.decodeByteArray(decodedBytes, 0, decodedBytes.size)
+                profileImage.setImageBitmap(bitmap)
+            } catch (e: Exception) {
+                e.printStackTrace()
+                profileImage.setImageResource(R.drawable.profile_image)
+            }
         } else {
             profileImage.setImageResource(R.drawable.profile_image)
         }
@@ -165,6 +171,12 @@ class followers : AppCompatActivity() {
         followersList.clear()
         followersList.addAll(filtered)
         userAdapter.notifyDataSetChanged()
+        updateResultsCount()
+    }
+
+    private fun updateResultsCount() {
+        val count = followersList.size
+        resultsCount.text = if (count == 1) "1 result" else "$count results"
     }
 
     private fun syncFollowers(query: String) {

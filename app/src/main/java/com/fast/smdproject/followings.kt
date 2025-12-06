@@ -27,6 +27,7 @@ class followings : AppCompatActivity() {
     private lateinit var username: TextView
     private lateinit var lastSync: TextView
     private lateinit var refreshText: TextView
+    private lateinit var resultsCount: TextView
     private val followingList = ArrayList<User>()
     private var allFollowing = ArrayList<User>()
 
@@ -60,6 +61,7 @@ class followings : AppCompatActivity() {
         username = findViewById(R.id.username)
         lastSync = findViewById(R.id.lastSync)
         refreshText = findViewById(R.id.refreshText)
+        resultsCount = findViewById(R.id.resultsCount)
 
         val menuIcon = findViewById<ImageView>(R.id.menuIcon)
         val profileIcon = findViewById<ImageView>(R.id.profileIcon)
@@ -163,6 +165,12 @@ class followings : AppCompatActivity() {
         followingList.clear()
         followingList.addAll(filtered)
         userAdapter.notifyDataSetChanged()
+        updateResultsCount()
+    }
+
+    private fun updateResultsCount() {
+        val count = followingList.size
+        resultsCount.text = if (count == 1) "1 result" else "$count results"
     }
 
     private fun syncFollowing(query: String) {
