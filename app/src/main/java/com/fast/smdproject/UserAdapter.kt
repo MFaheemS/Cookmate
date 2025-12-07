@@ -50,17 +50,37 @@ class UserAdapter(
             holder.userAvatar.setImageResource(R.drawable.default_avatar)
         }
 
+        // Check if profile is private
+        if (user.isPrivate) {
+            // Grey out the button for private profiles
+            holder.btnFollow.alpha = 0.5f
+            holder.btnFollow.text = "Private"
+            holder.btnFollow.isEnabled = false
+            holder.itemView.alpha = 0.7f
+        } else {
+            // Normal button for public profiles
+            holder.btnFollow.alpha = 1.0f
+            holder.btnFollow.text = "View"
+            holder.btnFollow.isEnabled = true
+            holder.itemView.alpha = 1.0f
+        }
+
         // Click on entire item or button to view profile with animations
         val clickListener = View.OnClickListener { view ->
-            com.fast.smdproject.AnimationUtils.buttonPressEffect(view) {
-                val intent = Intent(context, SecondUserProfileActivity::class.java)
-                intent.putExtra("user_id", user.userId)
-                intent.putExtra("username", user.username)
-                context.startActivity(intent)
-                (context as? android.app.Activity)?.overridePendingTransition(
-                    R.anim.activity_enter,
-                    R.anim.activity_exit
-                )
+            if (!user.isPrivate) {
+                com.fast.smdproject.AnimationUtils.buttonPressEffect(view) {
+                    val intent = Intent(context, SecondUserProfileActivity::class.java)
+                    intent.putExtra("user_id", user.userId)
+                    intent.putExtra("username", user.username)
+                    context.startActivity(intent)
+                    (context as? android.app.Activity)?.overridePendingTransition(
+                        R.anim.activity_enter,
+                        R.anim.activity_exit
+                    )
+                }
+            } else {
+                // Show message for private profile
+                android.widget.Toast.makeText(context, "This profile is private", android.widget.Toast.LENGTH_SHORT).show()
             }
         }
 

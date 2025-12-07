@@ -15,7 +15,15 @@ class ReminderReceiver : BroadcastReceiver() {
         val recipeId = intent.getIntExtra("RECIPE_ID", 0)
         val recipeTitle = intent.getStringExtra("RECIPE_TITLE") ?: "Recipe"
 
-        showNotification(context, recipeId, recipeTitle)
+        // Check notification settings
+        val db = UserDatabase(context)
+        val allowNotifications = db.allowNotifications()
+        val allowRecipeNotifications = db.allowRecipeNotifications()
+
+        // Only show notification if both settings are enabled
+        if (allowNotifications && allowRecipeNotifications) {
+            showNotification(context, recipeId, recipeTitle)
+        }
     }
 
     private fun showNotification(context: Context, recipeId: Int, recipeTitle: String) {

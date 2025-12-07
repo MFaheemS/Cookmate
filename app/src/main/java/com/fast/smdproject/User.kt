@@ -8,6 +8,7 @@ data class User(
     val profileImage: String?,
     val followersCount: Int = 0,
     val followingCount: Int = 0,
-    val uploadsCount: Int = 0
+    val uploadsCount: Int = 0,
+    val isPrivate: Boolean = false
 )
 

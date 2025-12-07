@@ -13,7 +13,7 @@ if ($user_id == 0) {
 // Get followers of the user
 $searchTerm = $query . "%";
 
-$sql = "SELECT u.user_id, u.username, u.first_name, u.last_name, u.profile_image
+$sql = "SELECT u.user_id, u.username, u.first_name, u.last_name, u.profile_image, u.is_private
         FROM Followers f
         JOIN Users u ON f.follower_id = u.user_id
         WHERE f.following_id = ?
@@ -27,6 +27,8 @@ $result = $stmt->get_result();
 
 $followers = array();
 while($row = $result->fetch_assoc()) {
+    // Ensure is_private is boolean
+    $row['is_private'] = (bool)($row['is_private'] ?? 0);
     $followers[] = $row;
 }
 

@@ -3,14 +3,15 @@ header('Content-Type: application/json; charset=utf-8');
 require 'db_connect.php';
 
 $user_id = isset($_GET['user_id']) ? intval($_GET['user_id']) : 0;
+$viewer_id = isset($_GET['viewer_id']) ? intval($_GET['viewer_id']) : 0;
 
 if ($user_id == 0) {
     echo json_encode(["status" => "error", "message" => "Invalid user ID"]);
     exit();
 }
 
-// Get user profile information
-$sql = "SELECT user_id, username, first_name, last_name, profile_image, created_at
+// Get user profile information including privacy setting
+$sql = "SELECT user_id, username, first_name, last_name, profile_image, created_at, is_private
         FROM Users
         WHERE user_id = ?";
 
@@ -25,6 +26,38 @@ if ($result->num_rows == 0) {
 }
 
 $user = $result->fetch_assoc();
+$is_private = isset($user['is_private']) ? (bool)$user['is_private'] : false;
+$user['is_private'] = $is_private;
+
+// Check if viewer can access this profile
+// User can ALWAYS view their own profile
+$can_view = true;
+$is_own_profile = ($viewer_id == $user_id);
+
+if ($is_private && !$is_own_profile && $viewer_id != 0) {
+    // Profile is private, viewer is not the owner
+    // Check if viewer is already following this user
+    $sqlCheckFollow = "SELECT COUNT(*) as is_following FROM Followers WHERE follower_id = ? AND following_id = ?";
+    $stmtCheckFollow = $conn->prepare($sqlCheckFollow);
+    $stmtCheckFollow->bind_param("ii", $viewer_id, $user_id);
+    $stmtCheckFollow->execute();
+    $resultCheckFollow = $stmtCheckFollow->get_result();
+    $followData = $resultCheckFollow->fetch_assoc();
+
+    $can_view = $followData['is_following'] > 0;
+    $stmtCheckFollow->close();
+}
+
+$user['can_view'] = $can_view;
+$user['is_own_profile'] = $is_own_profile;
+
+// If cannot view (private and not following), return limited profile info
+if (!$can_view && !$is_own_profile) {
+    echo json_encode(["status" => "success", "data" => $user]);
+    $stmt->close();
+    $conn->close();
+    exit();
+}
 
 // Get follower count
 $sqlFollowers = "SELECT COUNT(*) as followers_count FROM Followers WHERE following_id = ?";

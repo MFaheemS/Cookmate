@@ -6,7 +6,7 @@ import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
 
 class UserDatabase(context: Context) :
-    SQLiteOpenHelper(context, "user_db", null, 8) { // Changed version to 8
+    SQLiteOpenHelper(context, "user_db", null, 9) { // Changed version to 9
 
     override fun onCreate(db: SQLiteDatabase) {
 
@@ -21,7 +21,11 @@ class UserDatabase(context: Context) :
                     "profile_image TEXT," +
                     "followers_count INTEGER DEFAULT 0," +
                     "following_count INTEGER DEFAULT 0," +
-                    "uploads_count INTEGER DEFAULT 0" +
+                    "uploads_count INTEGER DEFAULT 0," +
+                    "is_private INTEGER DEFAULT 0," +
+                    "allow_notifications INTEGER DEFAULT 1," +
+                    "allow_recipe_notifications INTEGER DEFAULT 1," +
+                    "logout_on_close INTEGER DEFAULT 0" +
                     ")"
         )
 
@@ -213,6 +217,18 @@ class UserDatabase(context: Context) :
         }
         if (oldV < 8) {
             createPendingActionsTable(db)
+        }
+        if (oldV < 9) {
+            // Add settings columns to user table
+            try {
+                db.execSQL("ALTER TABLE user ADD COLUMN is_private INTEGER DEFAULT 0")
+                db.execSQL("ALTER TABLE user ADD COLUMN allow_notifications INTEGER DEFAULT 1")
+                db.execSQL("ALTER TABLE user ADD COLUMN allow_recipe_notifications INTEGER DEFAULT 1")
+                db.execSQL("ALTER TABLE user ADD COLUMN logout_on_close INTEGER DEFAULT 0")
+            } catch (e: Exception) {
+                // Columns might already exist
+                e.printStackTrace()
+            }
         }
     }
 
@@ -852,6 +868,79 @@ class UserDatabase(context: Context) :
         val cutoffTime = System.currentTimeMillis() - (olderThanDays * 24 * 60 * 60 * 1000L)
         db.delete("pending_actions", "user_id = ? AND created_at < ?", arrayOf(userId.toString(), cutoffTime.toString()))
         db.close()
+    }
+
+    // Settings Methods
+    fun updatePrivateProfile(isPrivate: Boolean) {
+        val db = writableDatabase
+        db.execSQL("UPDATE user SET is_private = ?", arrayOf<Any>(if (isPrivate) 1 else 0))
+        db.close()
+    }
+
+    fun isPrivateProfile(): Boolean {
+        val db = readableDatabase
+        val cursor = db.rawQuery("SELECT is_private FROM user LIMIT 1", null)
+        var isPrivate = false
+        if (cursor.moveToFirst()) {
+            isPrivate = cursor.getInt(0) == 1
+        }
+        cursor.close()
+        db.close()
+        return isPrivate
+    }
+
+    fun updateAllowNotifications(allow: Boolean) {
+        val db = writableDatabase
+        db.execSQL("UPDATE user SET allow_notifications = ?", arrayOf<Any>(if (allow) 1 else 0))
+        db.close()
+    }
+
+    fun allowNotifications(): Boolean {
+        val db = readableDatabase
+        val cursor = db.rawQuery("SELECT allow_notifications FROM user LIMIT 1", null)
+        var allow = true
+        if (cursor.moveToFirst()) {
+            allow = cursor.getInt(0) == 1
+        }
+        cursor.close()
+        db.close()
+        return allow
+    }
+
+    fun updateAllowRecipeNotifications(allow: Boolean) {
+        val db = writableDatabase
+        db.execSQL("UPDATE user SET allow_recipe_notifications = ?", arrayOf<Any>(if (allow) 1 else 0))
+        db.close()
+    }
+
+    fun allowRecipeNotifications(): Boolean {
+        val db = readableDatabase
+        val cursor = db.rawQuery("SELECT allow_recipe_notifications FROM user LIMIT 1", null)
+        var allow = true
+        if (cursor.moveToFirst()) {
+            allow = cursor.getInt(0) == 1
+        }
+        cursor.close()
+        db.close()
+        return allow
+    }
+
+    fun updateLogoutOnClose(enabled: Boolean) {
+        val db = writableDatabase
+        db.execSQL("UPDATE user SET logout_on_close = ?", arrayOf<Any>(if (enabled) 1 else 0))
+        db.close()
+    }
+
+    fun logoutOnClose(): Boolean {
+        val db = readableDatabase
+        val cursor = db.rawQuery("SELECT logout_on_close FROM user LIMIT 1", null)
+        var enabled = false
+        if (cursor.moveToFirst()) {
+            enabled = cursor.getInt(0) == 1
+        }
+        cursor.close()
+        db.close()
+        return enabled
     }
 }
 

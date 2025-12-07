@@ -131,13 +131,25 @@ class SecondUserProfileActivity : AppCompatActivity() {
 
     private fun fetchUserProfile() {
         val ipAddress = getString(R.string.ipAddress)
-        val url = "http://$ipAddress/cookMate/get_user_profile.php?user_id=$userId"
+        val db = UserDatabase(this)
+        val currentUserId = db.getCurrentUserId()
+        val url = "http://$ipAddress/cookMate/get_user_profile.php?user_id=$userId&viewer_id=$currentUserId"
 
         val request = JsonObjectRequest(Request.Method.GET, url, null,
             { response ->
                 try {
                     if (response.getString("status") == "success") {
                         val userData = response.getJSONObject("data")
+
+                        // Check if profile is private
+                        val isPrivate = userData.optBoolean("is_private", false)
+                        val canView = userData.optBoolean("can_view", true)
+
+                        if (isPrivate && !canView) {
+                            // Profile is private and user cannot view
+                            showPrivateProfileMessage()
+                            return@JsonObjectRequest
+                        }
 
                         // Set user information
                         val usernameText = userData.getString("username")
@@ -245,6 +257,18 @@ class SecondUserProfileActivity : AppCompatActivity() {
         )
 
         Volley.newRequestQueue(this).add(request)
+    }
+
+    private fun showPrivateProfileMessage() {
+        // Hide recipe grid
+        recyclerViewRecipes.visibility = View.GONE
+        tvEmptyState.visibility = View.VISIBLE
+        tvEmptyState.text = "This profile is private"
+
+        // Hide follow button for private profiles that user cannot view
+        followButton.visibility = View.GONE
+
+        Toast.makeText(this, "This profile is private", Toast.LENGTH_SHORT).show()
     }
 
     private fun toggleFollow() {

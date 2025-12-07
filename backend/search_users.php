@@ -13,7 +13,7 @@ if (trim($query) == '') {
 
 // Search for username or first_name or last_name starting with the query (not containing)
 $searchTerm = $query . "%";
-$sql = "SELECT user_id, username, first_name, last_name, profile_image
+$sql = "SELECT user_id, username, first_name, last_name, profile_image, is_private
         FROM Users
         WHERE (username LIKE ? OR first_name LIKE ? OR last_name LIKE ?)
         AND user_id != ?
@@ -26,6 +26,8 @@ $result = $stmt->get_result();
 
 $users = array();
 while($row = $result->fetch_assoc()) {
+    // Ensure is_private is boolean
+    $row['is_private'] = (bool)($row['is_private'] ?? 0);
     $users[] = $row;
 }
 

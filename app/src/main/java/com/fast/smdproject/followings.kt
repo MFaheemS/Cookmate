@@ -243,7 +243,8 @@ class followings : AppCompatActivity() {
                                 username = obj.getString("username"),
                                 firstName = obj.getString("first_name"),
                                 lastName = obj.getString("last_name"),
-                                profileImage = obj.optString("profile_image", "")
+                                profileImage = obj.optString("profile_image", ""),
+                                isPrivate = obj.optBoolean("is_private", false)
                             )
                             fetchedFollowing.add(user)
                         }

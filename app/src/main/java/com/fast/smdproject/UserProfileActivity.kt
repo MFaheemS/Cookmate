@@ -174,7 +174,8 @@ class UserProfileActivity : AppCompatActivity() {
 
     private fun syncProfileWithServer(db: UserDatabase, userId: Int) {
         val ipAddress = getString(R.string.ipAddress)
-        val url = "http://$ipAddress/cookMate/get_user_profile.php?user_id=$userId"
+        // Add viewer_id to ensure own profile always loads
+        val url = "http://$ipAddress/cookMate/get_user_profile.php?user_id=$userId&viewer_id=$userId"
 
         val request = JsonObjectRequest(Request.Method.GET, url, null,
             { response ->
