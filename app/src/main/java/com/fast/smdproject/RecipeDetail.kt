@@ -35,6 +35,7 @@ class RecipeDetail : AppCompatActivity() {
     private var currentRecipeId: Int = -1
     private var currentUserId: Int = 0
     private var recipeOwnerId: Int = 0
+    private var jungleLeavesAnimation: JungleLeavesAnimation? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -68,8 +69,16 @@ class RecipeDetail : AppCompatActivity() {
         val recipeId = intent.getIntExtra("RECIPE_ID", -1)
         currentRecipeId = recipeId
 
+        // Check if opened from shake gesture (for jungle leaves animation)
+        val fromShake = intent.getBooleanExtra("FROM_SHAKE", false)
+
         if (recipeId != -1) {
             fetchRecipeDetails(recipeId)
+
+            // Trigger jungle leaves animation if opened from shake
+            if (fromShake) {
+                triggerJungleLeavesAnimation()
+            }
         } else {
             Toast.makeText(this, "Error: Invalid Recipe ID", Toast.LENGTH_SHORT).show()
             finish()
@@ -786,5 +795,27 @@ class RecipeDetail : AppCompatActivity() {
         }
 
         Volley.newRequestQueue(this).add(request)
+    }
+
+    /**
+     * Trigger jungle leaves animation - called when recipe is opened from shake gesture
+     */
+    private fun triggerJungleLeavesAnimation() {
+        val leavesContainer = findViewById<android.widget.FrameLayout>(R.id.jungle_leaves_container)
+
+        // Wait a brief moment for the activity transition to complete
+        leavesContainer.postDelayed({
+            jungleLeavesAnimation = JungleLeavesAnimation(this, leavesContainer)
+            // Trigger burst with 25 leaves for a dramatic jungle effect
+            jungleLeavesAnimation?.triggerBurst(25)
+
+            android.util.Log.d("JungleLeaves", "Jungle leaves animation triggered!")
+        }, 300) // Short delay for smooth transition
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        // Clean up any remaining leaves
+        jungleLeavesAnimation?.cleanup()
     }
 }

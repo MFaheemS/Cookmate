@@ -244,4 +244,13 @@
             <View android:layout_width="match_parent" android:layout_height="20dp" />
         </LinearLayout>
     </ScrollView>
+
+    <!-- Jungle Leaves Container for Shake Feature Animation -->
+    <FrameLayout
+        android:id="@+id/jungle_leaves_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:clickable="false"
+        android:focusable="false" />
+
 </RelativeLayout>
