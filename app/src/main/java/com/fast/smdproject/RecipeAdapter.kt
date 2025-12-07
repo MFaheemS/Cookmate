@@ -12,7 +12,6 @@ import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
-import com.android.volley.Request
 import com.android.volley.Response
 import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
@@ -177,6 +176,16 @@ class RecipeAdapter(
                     if (json.getString("status") == "success") {
                         recipe.isDownloaded = !recipe.isDownloaded
                         recipe.downloadCount = json.getInt("download_count")
+
+                        // Update local database
+                        if (recipe.isDownloaded) {
+                            // Save to local database
+                            val downloadedAt = java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss", java.util.Locale.getDefault()).format(java.util.Date())
+                            db.saveDownloadedRecipe(recipe, userId, downloadedAt)
+                        } else {
+                            // Remove from local database
+                            db.deleteDownloadedRecipe(recipe.recipeId, userId)
+                        }
 
                         // Animate and update UI
                         animateIconChange(holder.iconDownload) {

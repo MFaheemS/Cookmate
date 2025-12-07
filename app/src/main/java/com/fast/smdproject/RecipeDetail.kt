@@ -89,6 +89,13 @@ class RecipeDetail : AppCompatActivity() {
     }
 
     private fun fetchRecipeDetails(id: Int) {
+        // Try loading from cache first (works offline)
+        val cachedRecipe = db?.getRecipeDetail(id)
+        if (cachedRecipe != null) {
+            populateUIFromCache(cachedRecipe)
+        }
+
+        // Then try to fetch from server (sync when online)
         val ipAddress = getString(R.string.ipAddress)
         val url = "http://$ipAddress/cookMate/get_recipe_detail.php"
 
@@ -99,26 +106,227 @@ class RecipeDetail : AppCompatActivity() {
                     val json = JSONObject(response)
                     if (json.getString("status") == "success") {
                         val data = json.getJSONObject("data")
+
+                        // Save to cache for offline access
+                        cacheRecipeDetails(data)
+
                         populateUI(data, ipAddress)
                     } else {
-                        Toast.makeText(this, json.getString("message"), Toast.LENGTH_SHORT).show()
+                        if (cachedRecipe == null) {
+                            Toast.makeText(this, json.getString("message"), Toast.LENGTH_SHORT).show()
+                        } else {
+                            Toast.makeText(this, "Showing cached data", Toast.LENGTH_SHORT).show()
+                        }
                     }
                 } catch (e: Exception) {
                     e.printStackTrace()
+                    if (cachedRecipe == null) {
+                        Toast.makeText(this, "Failed to load recipe", Toast.LENGTH_SHORT).show()
+                    } else {
+                        Toast.makeText(this, "Offline mode - showing cached data", Toast.LENGTH_SHORT).show()
+                    }
                 }
             },
             { error ->
-                Toast.makeText(this, "Network Error: ${error.message}", Toast.LENGTH_SHORT).show()
+                if (cachedRecipe == null) {
+                    Toast.makeText(this, "Network Error: ${error.message}", Toast.LENGTH_SHORT).show()
+                } else {
+                    Toast.makeText(this, "Offline mode - showing cached recipe", Toast.LENGTH_SHORT).show()
+                }
             }
         ) {
             override fun getParams(): MutableMap<String, String> {
                 val params = HashMap<String, String>()
                 params["recipe_id"] = id.toString()
+                params["user_id"] = currentUserId.toString()
                 return params
             }
         }
 
         Volley.newRequestQueue(this).add(request)
+    }
+
+    private fun cacheRecipeDetails(data: JSONObject) {
+        db?.saveRecipeDetail(
+            recipeId = data.getInt("recipe_id"),
+            title = data.getString("title"),
+            description = data.getString("description"),
+            ingredients = data.getString("ingredients"),
+            steps = data.getString("steps"),
+            tags = data.getString("tags"),
+            images = data.getString("images"),
+            likeCount = data.getInt("favorites_count"),
+            downloadCount = data.getInt("downloads_count"),
+            isLiked = data.optBoolean("is_liked", false),
+            isDownloaded = data.optBoolean("is_downloaded", false),
+            ownerId = data.optInt("user_id", 0),
+            ownerUsername = data.getString("username"),
+            ownerProfileImage = data.optString("profile_image", "")
+        )
+    }
+
+    private fun populateUIFromCache(cachedRecipe: HashMap<String, String>) {
+        txtTitle.text = cachedRecipe["title"]
+        txtDesc.text = cachedRecipe["description"]
+
+        val favCount = cachedRecipe["like_count"]?.toIntOrNull() ?: 0
+        val downloadCount = cachedRecipe["download_count"]?.toIntOrNull() ?: 0
+        val isLiked = cachedRecipe["is_liked"] == "1"
+        val isDownloaded = cachedRecipe["is_downloaded"] == "1"
+        recipeOwnerId = cachedRecipe["owner_id"]?.toIntOrNull() ?: 0
+
+        txtFavCount.text = favCount.toString()
+        txtDownloadCount.text = downloadCount.toString()
+
+        iconLike.setImageResource(if (isLiked) R.drawable.ic_like_fill else R.drawable.ic_like)
+        iconDownload.setImageResource(if (isDownloaded) R.drawable.ic_downloaded else R.drawable.ic_download)
+
+        val ownerUsername = cachedRecipe["owner_username"] ?: ""
+        val isOwnRecipe = (db != null && db!!.getUsername() == ownerUsername)
+
+        if(isOwnRecipe){
+            txtUsername.text = "You"
+            btnFollow.visibility = View.GONE
+            iconLike.alpha = 0.3f
+            iconDownload.alpha = 0.3f
+            iconLike.isEnabled = false
+            iconDownload.isEnabled = false
+        } else {
+            txtUsername.text = ownerUsername
+            btnFollow.visibility = View.VISIBLE
+            iconLike.alpha = 1.0f
+            iconDownload.alpha = 1.0f
+            iconLike.isEnabled = true
+            iconDownload.isEnabled = true
+        }
+
+        // Load images
+        val imagesString = cachedRecipe["images"] ?: "[]"
+        loadImagesFromCache(imagesString)
+
+        // Load tags
+        val tagsString = cachedRecipe["tags"] ?: ""
+        loadTagsFromCache(tagsString)
+
+        // Load ingredients
+        val ingredientsString = cachedRecipe["ingredients"] ?: ""
+        loadIngredientsFromCache(ingredientsString)
+
+        // Load steps
+        val stepsString = cachedRecipe["steps"] ?: ""
+        loadStepsFromCache(stepsString)
+
+        // Load profile image - try to load from network with proper fallback
+        val profileImage = cachedRecipe["owner_profile_image"] ?: ""
+        if (profileImage.isNotEmpty() && profileImage != "null") {
+            val ipAddress = getString(R.string.ipAddress)
+            Glide.with(this)
+                .load("http://$ipAddress/cookMate/$profileImage")
+                .circleCrop()
+                .placeholder(R.drawable.default_pfp)
+                .error(R.drawable.default_pfp)
+                .into(imgUser)
+        } else {
+            Glide.with(this)
+                .load(R.drawable.default_pfp)
+                .circleCrop()
+                .into(imgUser)
+        }
+
+        setupClickListeners(isOwnRecipe)
+    }
+
+    private fun loadImagesFromCache(imagesString: String) {
+        try {
+            val imagesArray = JSONArray(imagesString)
+            val imagesList = mutableListOf<String>()
+            for (i in 0 until imagesArray.length()) {
+                imagesList.add(imagesArray.getString(i))
+            }
+
+            if (imagesList.isNotEmpty()) {
+                val ipAddress = getString(R.string.ipAddress)
+                val adapter = ImageGalleryAdapter(imagesList, ipAddress)
+                imageGallery.adapter = adapter
+
+                // Set initial position to middle of infinite list
+                val middlePosition = Int.MAX_VALUE / 2
+                val startPosition = middlePosition - (middlePosition % imagesList.size)
+                imageGallery.setCurrentItem(startPosition, false)
+
+                imageCounter.visibility = View.GONE
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
+
+    private fun loadTagsFromCache(tagsString: String) {
+        tagsContainer.removeAllViews()
+        val tags = tagsString.split(",").map { it.trim() }.filter { it.isNotEmpty() }
+        for (tag in tags) {
+            val textView = TextView(this)
+            textView.text = tag.trim()
+            textView.setTextColor(resources.getColor(R.color.white, null))
+            textView.textSize = 12f
+            textView.setPadding(20, 10, 20, 10)
+            tagsContainer.addView(textView)
+        }
+    }
+
+    private fun loadIngredientsFromCache(ingredientsString: String) {
+        ingredientsContainer.removeAllViews()
+        try {
+            val ingredientsArray = JSONArray(ingredientsString)
+            for (i in 0 until ingredientsArray.length()) {
+                val obj = ingredientsArray.getJSONObject(i)
+                val view = layoutInflater.inflate(R.layout.item_ingredient_display, ingredientsContainer, false)
+                val txtName = view.findViewById<TextView>(R.id.txt_ing_name)
+                val txtQty = view.findViewById<TextView>(R.id.txt_ing_qty)
+
+                txtName.text = obj.getString("name")
+                txtQty.text = obj.getString("qty")
+
+                ingredientsContainer.addView(view)
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
+
+    private fun loadStepsFromCache(stepsString: String) {
+        stepsContainer.removeAllViews()
+        try {
+            val stepsArray = JSONArray(stepsString)
+            for (i in 0 until stepsArray.length()) {
+                val stepDesc = stepsArray.getString(i)
+
+                val view = layoutInflater.inflate(R.layout.item_step_display, stepsContainer, false)
+                val txtNum = view.findViewById<TextView>(R.id.txt_step_number)
+                val txtDesc = view.findViewById<TextView>(R.id.txt_step_desc)
+
+                txtNum.text = "Step ${i + 1}"
+                txtDesc.text = stepDesc
+
+                stepsContainer.addView(view)
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
+
+    private fun setupClickListeners(isOwnRecipe: Boolean) {
+        if (isOwnRecipe) {
+            iconLike.setOnClickListener {
+                Toast.makeText(this, "You cannot like your own recipe", Toast.LENGTH_SHORT).show()
+            }
+            iconDownload.setOnClickListener {
+                Toast.makeText(this, "You cannot download your own recipe", Toast.LENGTH_SHORT).show()
+            }
+        } else {
+            iconLike.setOnClickListener { toggleLike() }
+            iconDownload.setOnClickListener { toggleDownload() }
+        }
     }
 
     private fun populateUI(data: JSONObject, ipAddress: String) {
@@ -147,15 +355,19 @@ class RecipeDetail : AppCompatActivity() {
         if(isOwnRecipe){
             txtUsername.text = "You"
             btnFollow.visibility = View.GONE
-            // Hide like/download for own recipes
-            iconLike.visibility = View.GONE
-            iconDownload.visibility = View.GONE
+            // Grey out like/download for own recipes (disable but show counts)
+            iconLike.alpha = 0.3f
+            iconDownload.alpha = 0.3f
+            iconLike.isEnabled = false
+            iconDownload.isEnabled = false
         }
         else{
             txtUsername.text = data.getString("username")
             btnFollow.visibility = View.VISIBLE
-            iconLike.visibility = View.VISIBLE
-            iconDownload.visibility = View.VISIBLE
+            iconLike.alpha = 1.0f
+            iconDownload.alpha = 1.0f
+            iconLike.isEnabled = true
+            iconDownload.isEnabled = true
 
             // Setup click listeners for like and download
             iconLike.setOnClickListener {
@@ -269,6 +481,15 @@ class RecipeDetail : AppCompatActivity() {
         val isCurrentlyLiked = iconLike.drawable.constantState ==
             resources.getDrawable(R.drawable.ic_like_fill, null)?.constantState
 
+        // Update UI optimistically (immediately)
+        iconLike.setImageResource(
+            if (isCurrentlyLiked) R.drawable.ic_like else R.drawable.ic_like_fill
+        )
+
+        val currentCount = txtFavCount.text.toString().toIntOrNull() ?: 0
+        val newCount = if (isCurrentlyLiked) currentCount - 1 else currentCount + 1
+        txtFavCount.text = newCount.toString()
+
         val ipAddress = getString(R.string.ipAddress)
         val url = if (isCurrentlyLiked) {
             "http://$ipAddress/cookMate/unlike_recipe.php"
@@ -283,25 +504,32 @@ class RecipeDetail : AppCompatActivity() {
                 try {
                     val json = JSONObject(response)
                     if (json.getString("status") == "success") {
-                        // Update icon
-                        iconLike.setImageResource(
-                            if (isCurrentlyLiked) R.drawable.ic_like else R.drawable.ic_like_fill
-                        )
-
-                        // Update count
-                        val currentCount = txtFavCount.text.toString().toIntOrNull() ?: 0
-                        val newCount = if (isCurrentlyLiked) currentCount - 1 else currentCount + 1
-                        txtFavCount.text = newCount.toString()
-
                         val message = if (isCurrentlyLiked) "Removed from favorites" else "Added to favorites"
                         Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
+                    } else {
+                        // Revert UI on server error
+                        iconLike.setImageResource(
+                            if (isCurrentlyLiked) R.drawable.ic_like_fill else R.drawable.ic_like
+                        )
+                        txtFavCount.text = currentCount.toString()
+                        Toast.makeText(this, "Action failed", Toast.LENGTH_SHORT).show()
                     }
                 } catch (e: Exception) {
+                    // Revert UI on error
+                    iconLike.setImageResource(
+                        if (isCurrentlyLiked) R.drawable.ic_like_fill else R.drawable.ic_like
+                    )
+                    txtFavCount.text = currentCount.toString()
                     Toast.makeText(this, "Error: ${e.message}", Toast.LENGTH_SHORT).show()
                 }
             },
             { error ->
-                Toast.makeText(this, "Network error", Toast.LENGTH_SHORT).show()
+                // Queue action for later if network fails
+                val db = UserDatabase(this)
+                val actionType = if (isCurrentlyLiked) "unlike" else "like"
+                db.queueAction(currentUserId, actionType, currentRecipeId, "recipe")
+
+                Toast.makeText(this, "Action queued - will sync when online", Toast.LENGTH_SHORT).show()
             }
         ) {
             override fun getParams(): MutableMap<String, String> {
@@ -320,6 +548,25 @@ class RecipeDetail : AppCompatActivity() {
         val isCurrentlyDownloaded = iconDownload.drawable.constantState ==
             resources.getDrawable(R.drawable.ic_downloaded, null)?.constantState
 
+        val db = UserDatabase(this)
+
+        // Update UI optimistically (immediately)
+        iconDownload.setImageResource(
+            if (isCurrentlyDownloaded) R.drawable.ic_download else R.drawable.ic_downloaded
+        )
+
+        val currentCount = txtDownloadCount.text.toString().toIntOrNull() ?: 0
+        val newCount = if (isCurrentlyDownloaded) currentCount - 1 else currentCount + 1
+        txtDownloadCount.text = newCount.toString()
+
+        // Update local database immediately
+        if (!isCurrentlyDownloaded) {
+            fetchAndSaveRecipeToLocal(currentRecipeId)
+        } else {
+            db.deleteDownloadedRecipe(currentRecipeId, currentUserId)
+            db.deleteRecipeDetail(currentRecipeId)
+        }
+
         val ipAddress = getString(R.string.ipAddress)
         val url = if (isCurrentlyDownloaded) {
             "http://$ipAddress/cookMate/remove_download.php"
@@ -334,31 +581,114 @@ class RecipeDetail : AppCompatActivity() {
                 try {
                     val json = JSONObject(response)
                     if (json.getString("status") == "success") {
-                        // Update icon
-                        iconDownload.setImageResource(
-                            if (isCurrentlyDownloaded) R.drawable.ic_download else R.drawable.ic_downloaded
-                        )
-
-                        // Update count
-                        val currentCount = txtDownloadCount.text.toString().toIntOrNull() ?: 0
-                        val newCount = if (isCurrentlyDownloaded) currentCount - 1 else currentCount + 1
-                        txtDownloadCount.text = newCount.toString()
-
                         val message = if (isCurrentlyDownloaded) "Removed from downloads" else "Added to downloads"
                         Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
+                    } else {
+                        // Revert UI on server error
+                        iconDownload.setImageResource(
+                            if (isCurrentlyDownloaded) R.drawable.ic_downloaded else R.drawable.ic_download
+                        )
+                        txtDownloadCount.text = currentCount.toString()
+                        Toast.makeText(this, "Action failed", Toast.LENGTH_SHORT).show()
                     }
                 } catch (e: Exception) {
+                    // Revert UI on error
+                    iconDownload.setImageResource(
+                        if (isCurrentlyDownloaded) R.drawable.ic_downloaded else R.drawable.ic_download
+                    )
+                    txtDownloadCount.text = currentCount.toString()
                     Toast.makeText(this, "Error: ${e.message}", Toast.LENGTH_SHORT).show()
                 }
             },
             { error ->
-                Toast.makeText(this, "Network error", Toast.LENGTH_SHORT).show()
+                // Queue action for later if network fails
+                val actionType = if (isCurrentlyDownloaded) "undownload" else "download"
+                db.queueAction(currentUserId, actionType, currentRecipeId, "recipe")
+
+                Toast.makeText(this, "Action queued - will sync when online", Toast.LENGTH_SHORT).show()
             }
         ) {
             override fun getParams(): MutableMap<String, String> {
                 val params = HashMap<String, String>()
                 params["user_id"] = currentUserId.toString()
                 params["recipe_id"] = currentRecipeId.toString()
+                return params
+            }
+        }
+
+        Volley.newRequestQueue(this).add(request)
+    }
+
+    private fun fetchAndSaveRecipeToLocal(recipeId: Int) {
+        val ipAddress = getString(R.string.ipAddress)
+        val url = "http://$ipAddress/cookMate/get_recipe_detail.php"
+
+        val request = object : StringRequest(
+            Method.POST, url,
+            { response ->
+                try {
+                    val json = JSONObject(response)
+                    if (json.getString("status") == "success") {
+                        val data = json.getJSONObject("data")
+
+                        // Parse images
+                        val imagesString = data.getString("images")
+                        val coverImage = try {
+                            val imagesArray = JSONArray(imagesString)
+                            if (imagesArray.length() > 0) {
+                                imagesArray.getString(0)
+                            } else {
+                                ""
+                            }
+                        } catch (e: Exception) {
+                            imagesString
+                        }
+
+                        val recipe = Recipe(
+                            recipeId = data.getInt("recipe_id"),
+                            title = data.getString("title"),
+                            description = data.getString("description"),
+                            tags = data.getString("tags"),
+                            imagePath = coverImage,
+                            likeCount = data.optInt("favorites_count", data.optInt("like_count", 0)),
+                            downloadCount = data.optInt("downloads_count", data.optInt("download_count", 0)),
+                            isLiked = data.optBoolean("is_liked", false),
+                            isDownloaded = true,
+                            ownerId = data.getInt("user_id")
+                        )
+
+                        val db = UserDatabase(this)
+                        val downloadedAt = java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss", java.util.Locale.getDefault()).format(java.util.Date())
+                        db.saveDownloadedRecipe(recipe, currentUserId, downloadedAt)
+
+                        // Also cache full recipe details for offline viewing
+                        db.saveRecipeDetail(
+                            recipeId = data.getInt("recipe_id"),
+                            title = data.getString("title"),
+                            description = data.getString("description"),
+                            ingredients = data.getString("ingredients"),
+                            steps = data.getString("steps"),
+                            tags = data.getString("tags"),
+                            images = imagesString,
+                            likeCount = data.optInt("favorites_count", data.optInt("like_count", 0)),
+                            downloadCount = data.optInt("downloads_count", data.optInt("download_count", 0)),
+                            isLiked = data.optBoolean("is_liked", false),
+                            isDownloaded = true,
+                            ownerId = data.getInt("user_id"),
+                            ownerUsername = data.getString("username"),
+                            ownerProfileImage = data.optString("profile_image", "")
+                        )
+                    }
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                }
+            },
+            { }
+        ) {
+            override fun getParams(): MutableMap<String, String> {
+                val params = HashMap<String, String>()
+                params["recipe_id"] = recipeId.toString()
+                params["user_id"] = currentUserId.toString()
                 return params
             }
         }

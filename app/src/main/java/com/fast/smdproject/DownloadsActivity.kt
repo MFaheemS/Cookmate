@@ -65,6 +65,30 @@ class DownloadsActivity : AppCompatActivity() {
             return
         }
 
+        // First, load from local SQLite (works offline)
+        loadFromLocalDatabase(userId, db)
+
+        // Then try to sync with server (only when online)
+        syncWithServer(userId, db)
+    }
+
+    private fun loadFromLocalDatabase(userId: Int, db: UserDatabase) {
+        val (recipes, times) = db.getDownloadedRecipes(userId)
+
+        recipeList.clear()
+        downloadTimes.clear()
+
+        recipeList.addAll(recipes)
+        downloadTimes.putAll(times)
+
+        downloadRecipeAdapter.notifyDataSetChanged()
+
+        if (recipeList.isEmpty()) {
+            Toast.makeText(this, "No downloads yet", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun syncWithServer(userId: Int, db: UserDatabase) {
         val ipAddress = getString(R.string.ipAddress)
         val url = "http://$ipAddress/cookMate/get_downloaded_recipes.php?user_id=$userId"
 
@@ -73,6 +97,9 @@ class DownloadsActivity : AppCompatActivity() {
                 try {
                     if (response.getString("status") == "success") {
                         val jsonArray = response.getJSONArray("data")
+
+                        // Clear and sync with server data
+                        db.clearDownloadedRecipes(userId)
                         recipeList.clear()
                         downloadTimes.clear()
 
@@ -105,9 +132,18 @@ class DownloadsActivity : AppCompatActivity() {
                                 isDownloaded = obj.getBoolean("is_downloaded"),
                                 ownerId = obj.optInt("user_id", 0)
                             )
+
+                            val downloadedAt = obj.getString("downloaded_at")
+
+                            // Save to local database
+                            db.saveDownloadedRecipe(recipe, userId, downloadedAt)
+
                             recipeList.add(recipe)
-                            downloadTimes[recipeId] = obj.getString("downloaded_at")
+                            downloadTimes[recipeId] = downloadedAt
                         }
+
+                        // Update sync timestamp
+                        db.updateDownloadedRecipesSyncStatus(userId)
 
                         downloadRecipeAdapter.notifyDataSetChanged()
 
@@ -115,15 +151,17 @@ class DownloadsActivity : AppCompatActivity() {
                             Toast.makeText(this, "No downloads yet", Toast.LENGTH_SHORT).show()
                         }
                     } else {
-                        Toast.makeText(this, "Failed to load downloads", Toast.LENGTH_SHORT).show()
+                        // Server error, keep local data
+                        Toast.makeText(this, "Using offline data", Toast.LENGTH_SHORT).show()
                     }
                 } catch (e: JSONException) {
                     e.printStackTrace()
-                    Toast.makeText(this, "Error: ${e.message}", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this, "Using offline data", Toast.LENGTH_SHORT).show()
                 }
             },
             { error ->
-                Toast.makeText(this, "Network Error: ${error.message}", Toast.LENGTH_SHORT).show()
+                // Network error, keep local data
+                Toast.makeText(this, "Offline mode - showing cached downloads", Toast.LENGTH_SHORT).show()
             }
         )
 

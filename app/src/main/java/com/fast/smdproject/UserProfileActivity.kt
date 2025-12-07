@@ -109,6 +109,70 @@ class UserProfileActivity : AppCompatActivity() {
             return
         }
 
+        // Load from cache first (works offline)
+        loadProfileFromCache(db, userId)
+
+        // Then sync with server (when online)
+        syncProfileWithServer(db, userId)
+    }
+
+    private fun loadProfileFromCache(db: UserDatabase, userId: Int) {
+        // Load user info
+        val userInfo = db.getUserInfo()
+        if (userInfo.isNotEmpty()) {
+            tvUsername.text = userInfo["username"] ?: ""
+
+            val profileImage = userInfo["profile_image"] ?: ""
+            if (profileImage.isNotEmpty() && profileImage != "null") {
+                val ipAddress = getString(R.string.ipAddress)
+                val imageUrl = "http://$ipAddress/cookMate/$profileImage"
+                Glide.with(this)
+                    .load(imageUrl)
+                    .placeholder(R.drawable.profile_image)
+                    .error(R.drawable.profile_image)
+                    .into(ivProfile)
+            }
+        }
+
+        // Load cached counts
+        val counts = db.getUserCounts()
+        tvFollowersCount.text = counts.first.toString()
+        tvFollowingCount.text = counts.second.toString()
+        tvUploadsCount.text = counts.third.toString()
+
+        // Load cached uploads
+        val cachedUploads = db.getUserUploads(userId)
+        if (cachedUploads.isNotEmpty()) {
+            recipeList.clear()
+            tvEmptyState.visibility = View.GONE
+            recyclerViewRecipes.visibility = View.VISIBLE
+
+            for (uploadMap in cachedUploads) {
+                val recipe = Recipe(
+                    recipeId = uploadMap["recipe_id"]?.toIntOrNull() ?: 0,
+                    title = uploadMap["title"] ?: "",
+                    description = uploadMap["description"] ?: "",
+                    tags = uploadMap["tags"] ?: "",
+                    imagePath = try {
+                        val imagesString = uploadMap["images"] ?: "[]"
+                        val imagesArray = JSONArray(imagesString)
+                        if (imagesArray.length() > 0) imagesArray.getString(0) else ""
+                    } catch (e: Exception) {
+                        uploadMap["images"] ?: ""
+                    },
+                    likeCount = uploadMap["like_count"]?.toIntOrNull() ?: 0,
+                    downloadCount = uploadMap["download_count"]?.toIntOrNull() ?: 0
+                )
+                recipeList.add(recipe)
+            }
+            recipeAdapter.notifyDataSetChanged()
+        } else {
+            tvEmptyState.visibility = View.VISIBLE
+            recyclerViewRecipes.visibility = View.GONE
+        }
+    }
+
+    private fun syncProfileWithServer(db: UserDatabase, userId: Int) {
         val ipAddress = getString(R.string.ipAddress)
         val url = "http://$ipAddress/cookMate/get_user_profile.php?user_id=$userId"
 
@@ -125,6 +189,9 @@ class UserProfileActivity : AppCompatActivity() {
                         val followingCount = userData.getInt("following_count")
                         val uploadsCount = userData.getInt("uploads_count")
 
+                        // Update cached counts
+                        db.updateUserCounts(followersCount, followingCount, uploadsCount)
+
                         tvUsername.text = username
                         tvFollowersCount.text = followersCount.toString()
                         tvFollowingCount.text = followingCount.toString()
@@ -140,8 +207,11 @@ class UserProfileActivity : AppCompatActivity() {
                                 .into(ivProfile)
                         }
 
-                        // Load recipes
+                        // Load recipes and cache them
                         val recipesArray = userData.getJSONArray("recipes")
+
+                        // Clear old cache and save new uploads
+                        db.clearUserUploads(userId)
                         recipeList.clear()
 
                         if (recipesArray.length() == 0) {
@@ -175,24 +245,41 @@ class UserProfileActivity : AppCompatActivity() {
                                     title = obj.getString("title"),
                                     description = obj.getString("description"),
                                     tags = obj.getString("tags"),
-                                    imagePath = coverImage
+                                    imagePath = coverImage,
+                                    likeCount = obj.optInt("like_count", 0),
+                                    downloadCount = obj.optInt("download_count", 0)
                                 )
                                 recipeList.add(recipe)
+
+                                // Cache upload to local database
+                                db.saveUserUpload(
+                                    recipeId = obj.getInt("recipe_id"),
+                                    userId = userId,
+                                    title = obj.getString("title"),
+                                    description = obj.getString("description"),
+                                    ingredients = obj.optString("ingredients", "[]"),
+                                    steps = obj.optString("steps", "[]"),
+                                    tags = obj.getString("tags"),
+                                    images = imagesString,
+                                    likeCount = obj.optInt("like_count", 0),
+                                    downloadCount = obj.optInt("download_count", 0),
+                                    createdAt = obj.optString("created_at", "")
+                                )
                             }
 
                             recipeAdapter.notifyDataSetChanged()
                         }
 
                     } else {
-                        Toast.makeText(this, "Failed to load profile", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this, "Using cached profile data", Toast.LENGTH_SHORT).show()
                     }
                 } catch (e: JSONException) {
                     e.printStackTrace()
-                    Toast.makeText(this, "Error: ${e.message}", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this, "Using cached profile data", Toast.LENGTH_SHORT).show()
                 }
             },
             { error ->
-                Toast.makeText(this, "Network Error: ${error.message}", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "Offline mode - showing cached uploads", Toast.LENGTH_SHORT).show()
             }
         )
 

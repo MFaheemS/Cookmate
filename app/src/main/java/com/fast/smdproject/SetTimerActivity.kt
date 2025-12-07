@@ -2,7 +2,6 @@ package com.fast.smdproject
 
 import android.app.AlarmManager
 import android.app.PendingIntent
-import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.widget.Button
@@ -144,47 +143,42 @@ class SetTimerActivity : AppCompatActivity() {
     }
 
     private fun saveReminder(timeInMillis: Long) {
-        val sharedPrefs = getSharedPreferences("Reminders", MODE_PRIVATE)
-        val editor = sharedPrefs.edit()
-
-        // Store reminder locally in SharedPreferences
-        editor.putLong("reminder_$recipeId", timeInMillis)
-        editor.putString("reminder_title_$recipeId", recipeTitle)
-        editor.putString("reminder_image_$recipeId", recipeImage)
-        editor.apply()
-
-        // Sync with database
-        syncReminderToDatabase(timeInMillis)
-    }
-
-    private fun syncReminderToDatabase(timeInMillis: Long) {
         val db = UserDatabase(this)
         val userId = db.getCurrentUserId()
 
         if (userId == 0) {
+            Toast.makeText(this, "Please login first", Toast.LENGTH_SHORT).show()
             return
         }
 
+        // Save to local SQLite database first (works offline)
+        val reminder = Reminder(recipeId, recipeTitle, timeInMillis, recipeImage)
+        db.saveReminder(reminder, userId)
+
+        // Then sync with server (only when online)
+        syncReminderToDatabase(timeInMillis, userId, db)
+    }
+
+    private fun syncReminderToDatabase(timeInMillis: Long, userId: Int, db: UserDatabase) {
         val ipAddress = getString(R.string.ipAddress)
         val url = "http://$ipAddress/cookMate/save_reminder.php"
 
-        val request = object : com.android.volley.toolbox.StringRequest(
+        val request = object : StringRequest(
             Method.POST,
             url,
             Response.Listener { response ->
                 try {
                     val json = JSONObject(response)
                     if (json.getString("status") == "success") {
-                        // Successfully synced to database
-                        Toast.makeText(this, "Reminder saved", Toast.LENGTH_SHORT).show()
+                        // Successfully synced to server
+                        db.updateRemindersSyncStatus(userId)
                     }
                 } catch (e: Exception) {
                     e.printStackTrace()
                 }
             },
             Response.ErrorListener { error ->
-                // Failed to sync, but local storage still works
-                Toast.makeText(this, "Reminder saved locally", Toast.LENGTH_SHORT).show()
+                // Failed to sync, but local SQLite storage still works
             }
         ) {
             override fun getParams(): MutableMap<String, String> {

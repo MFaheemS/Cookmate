@@ -24,6 +24,9 @@ class HomePage : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_home_page)
 
+        // Process any pending actions from offline mode
+        processPendingActions()
+
         // Check for new notifications
         checkForNotifications()
 
@@ -115,6 +118,13 @@ class HomePage : AppCompatActivity() {
         )
 
         Volley.newRequestQueue(this).add(request)
+    }
+
+    private fun processPendingActions() {
+        val actionQueue = ActionQueueService(this)
+        actionQueue.processPendingActions {
+            // Actions processed, optionally refresh data
+        }
     }
 
     private fun checkForNotifications() {

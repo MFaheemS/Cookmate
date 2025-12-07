@@ -1,6 +1,5 @@
 package com.fast.smdproject
 
-import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.widget.ImageView
@@ -60,6 +59,37 @@ class ReminderActivity : AppCompatActivity() {
             return
         }
 
+        // First load from local database (works offline)
+        loadFromLocalDatabase(userId, db)
+
+        // Then try to sync with server (only when online)
+        syncRemindersWithServer(userId, db)
+    }
+
+    private fun loadFromLocalDatabase(userId: Int, db: UserDatabase) {
+        // Clean up expired reminders first
+        db.deleteExpiredReminders(userId)
+
+        // Load active reminders from database
+        val reminders = db.getReminders(userId)
+
+        reminderList.clear()
+        reminderMap.clear()
+
+        reminders.forEach { reminder ->
+            reminderMap[reminder.recipeId] = reminder
+        }
+
+        reminderList.addAll(reminderMap.values)
+        reminderList.sortBy { it.timeInMillis }
+        reminderAdapter.notifyDataSetChanged()
+
+        if (reminderList.isEmpty()) {
+            Toast.makeText(this, "No upcoming reminders", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun syncRemindersWithServer(userId: Int, db: UserDatabase) {
         val ipAddress = getString(R.string.ipAddress)
         val url = "http://$ipAddress/cookMate/get_reminders.php?user_id=$userId"
 
@@ -73,6 +103,9 @@ class ReminderActivity : AppCompatActivity() {
                         val jsonArray = response.getJSONArray("data")
                         val currentTime = System.currentTimeMillis()
 
+                        // Clear existing reminders and sync from server
+                        reminderMap.clear()
+
                         for (i in 0 until jsonArray.length()) {
                             val obj = jsonArray.getJSONObject(i)
                             val recipeId = obj.getInt("recipe_id")
@@ -80,17 +113,20 @@ class ReminderActivity : AppCompatActivity() {
                             val reminderTime = obj.getString("reminder_time").toLong()
                             val imagePath = obj.optString("image_path", "")
 
-                            // Only show future reminders
+                            // Only process future reminders
                             if (reminderTime > currentTime) {
-                                // Use map to ensure only one reminder per recipeId
-                                reminderMap[recipeId] = Reminder(recipeId, recipeTitle, reminderTime, imagePath)
+                                val reminder = Reminder(recipeId, recipeTitle, reminderTime, imagePath)
+                                reminderMap[recipeId] = reminder
 
-                                // Also save to local SharedPreferences for offline access
-                                saveToLocalCache(recipeId, recipeTitle, reminderTime, imagePath)
+                                // Save to local database
+                                db.saveReminder(reminder, userId)
                             }
                         }
 
-                        // Convert map to list and sort by time
+                        // Update sync timestamp
+                        db.updateRemindersSyncStatus(userId)
+
+                        // Update UI
                         reminderList.clear()
                         reminderList.addAll(reminderMap.values)
                         reminderList.sortBy { it.timeInMillis }
@@ -100,87 +136,23 @@ class ReminderActivity : AppCompatActivity() {
                             Toast.makeText(this, "No upcoming reminders", Toast.LENGTH_SHORT).show()
                         }
                     } else {
-                        val message = response.optString("message", "Failed to load reminders")
-                        Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
-                        // Fallback to local cache
-                        loadFromLocalCache()
+                        // Server returned error, keep local data
+                        Toast.makeText(this, "Using offline data", Toast.LENGTH_SHORT).show()
                     }
                 } catch (e: JSONException) {
                     e.printStackTrace()
-                    Toast.makeText(this, "Error parsing response: ${e.message}", Toast.LENGTH_SHORT).show()
-                    // Fallback to local SharedPreferences if network fails
-                    loadFromLocalCache()
+                    Toast.makeText(this, "Using offline data", Toast.LENGTH_SHORT).show()
                 }
             },
             { error ->
-                Toast.makeText(this, "Network error: ${error.message}. Loading from cache...", Toast.LENGTH_SHORT).show()
-                // Fallback to local SharedPreferences
-                loadFromLocalCache()
+                // Network error, keep local data
+                Toast.makeText(this, "Offline mode - showing cached reminders", Toast.LENGTH_SHORT).show()
             }
         )
 
         Volley.newRequestQueue(this).add(request)
     }
 
-    private fun saveToLocalCache(recipeId: Int, title: String, time: Long, imagePath: String) {
-        val sharedPrefs = getSharedPreferences("Reminders", Context.MODE_PRIVATE)
-        val editor = sharedPrefs.edit()
-        editor.putLong("reminder_$recipeId", time)
-        editor.putString("reminder_title_$recipeId", title)
-        editor.putString("reminder_image_$recipeId", imagePath)
-        editor.apply()
-    }
-
-    private fun loadFromLocalCache() {
-        reminderList.clear()
-        reminderMap.clear()
-
-        val sharedPrefs = getSharedPreferences("Reminders", Context.MODE_PRIVATE)
-        val allPrefs = sharedPrefs.all
-
-        // Find all reminder entries
-        val reminderIds = mutableSetOf<Int>()
-        for (key in allPrefs.keys) {
-            if (key.startsWith("reminder_") && !key.contains("title") && !key.contains("image")) {
-                val recipeId = key.removePrefix("reminder_").toIntOrNull()
-                if (recipeId != null) {
-                    reminderIds.add(recipeId)
-                }
-            }
-        }
-
-        // Load each reminder using map to ensure uniqueness
-        val currentTime = System.currentTimeMillis()
-        for (recipeId in reminderIds) {
-            val timeInMillis = sharedPrefs.getLong("reminder_$recipeId", 0L)
-
-            // Only show future reminders
-            if (timeInMillis > currentTime) {
-                val title = sharedPrefs.getString("reminder_title_$recipeId", "Unknown Recipe") ?: "Unknown Recipe"
-                val imagePath = sharedPrefs.getString("reminder_image_$recipeId", "") ?: ""
-
-                // Use map to ensure only one reminder per recipeId
-                reminderMap[recipeId] = Reminder(recipeId, title, timeInMillis, imagePath)
-            } else {
-                // Clean up expired reminders
-                val editor = sharedPrefs.edit()
-                editor.remove("reminder_$recipeId")
-                editor.remove("reminder_title_$recipeId")
-                editor.remove("reminder_image_$recipeId")
-                editor.apply()
-            }
-        }
-
-        // Convert map to list and sort by time
-        reminderList.clear()
-        reminderList.addAll(reminderMap.values)
-        reminderList.sortBy { it.timeInMillis }
-        reminderAdapter.notifyDataSetChanged()
-
-        if (reminderList.isEmpty()) {
-            Toast.makeText(this, "No reminders in cache", Toast.LENGTH_SHORT).show()
-        }
-    }
 
     private fun setupNavigation() {
         val btnHome = findViewById<ImageView>(R.id.home)

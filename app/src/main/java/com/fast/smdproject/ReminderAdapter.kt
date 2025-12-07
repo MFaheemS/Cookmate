@@ -112,6 +112,9 @@ class ReminderAdapter(
     }
 
     private fun deleteReminder(reminder: Reminder, position: Int) {
+        val db = UserDatabase(context)
+        val userId = db.getCurrentUserId()
+
         // Cancel the alarm
         val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
         val intent = Intent(context, ReminderReceiver::class.java)
@@ -123,13 +126,8 @@ class ReminderAdapter(
         )
         alarmManager.cancel(pendingIntent)
 
-        // Remove from SharedPreferences
-        val sharedPrefs = context.getSharedPreferences("Reminders", Context.MODE_PRIVATE)
-        val editor = sharedPrefs.edit()
-        editor.remove("reminder_${reminder.recipeId}")
-        editor.remove("reminder_title_${reminder.recipeId}")
-        editor.remove("reminder_image_${reminder.recipeId}")
-        editor.apply()
+        // Remove from local SQLite database
+        db.deleteReminder(reminder.recipeId, userId)
 
         // Remove from list and update UI
         reminders.removeAt(position)
@@ -138,21 +136,14 @@ class ReminderAdapter(
 
         Toast.makeText(context, "Reminder deleted", Toast.LENGTH_SHORT).show()
 
-        // Sync deletion with database
-        deleteFromDatabase(reminder.recipeId)
+        // Sync deletion with server database
+        deleteFromServerDatabase(reminder.recipeId, userId)
 
         // Callback to parent activity
         onReminderDeleted()
     }
 
-    private fun deleteFromDatabase(recipeId: Int) {
-        val db = UserDatabase(context)
-        val userId = db.getCurrentUserId()
-
-        if (userId == 0) {
-            return
-        }
-
+    private fun deleteFromServerDatabase(recipeId: Int, userId: Int) {
         val ipAddress = context.getString(R.string.ipAddress)
         val url = "http://$ipAddress/cookMate/delete_reminder.php"
 
@@ -161,14 +152,14 @@ class ReminderAdapter(
             url,
             Response.Listener { response ->
                 try {
-                    val json = JSONObject(response)
-                    // Successfully deleted from database
+                    JSONObject(response)
+                    // Successfully deleted from server database
                 } catch (e: Exception) {
                     e.printStackTrace()
                 }
             },
             Response.ErrorListener { error ->
-                // Failed to delete from database, but local deletion still works
+                // Failed to delete from server, but local deletion still works
             }
         ) {
             override fun getParams(): MutableMap<String, String> {

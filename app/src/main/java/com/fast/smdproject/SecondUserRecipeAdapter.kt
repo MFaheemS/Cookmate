@@ -210,6 +210,8 @@ class SecondUserRecipeAdapter(
                 try {
                     val json = JSONObject(response)
                     if (json.getString("status") == "success") {
+                        val db = UserDatabase(context)
+
                         // Toggle icon
                         val newState = !isCurrentlyDownloaded
                         iconDownload.setImageResource(
@@ -221,6 +223,15 @@ class SecondUserRecipeAdapter(
                         // Toggle checkmark and details button visibility
                         holder.iconCheck.visibility = if (newState) View.VISIBLE else View.GONE
                         holder.btnDetails.visibility = if (newState) View.GONE else View.VISIBLE
+
+                        // Update local database
+                        if (newState) {
+                            // Fetch and save recipe to local database
+                            fetchAndSaveRecipeToLocal(recipeId, db)
+                        } else {
+                            // Remove from local database
+                            db.deleteDownloadedRecipe(recipeId, currentUserId)
+                        }
 
                         val message = if (isCurrentlyDownloaded) "Removed from downloads" else "Added to downloads"
                         Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
@@ -237,6 +248,81 @@ class SecondUserRecipeAdapter(
                 val params = HashMap<String, String>()
                 params["user_id"] = currentUserId.toString()
                 params["recipe_id"] = recipeId.toString()
+                return params
+            }
+        }
+
+        Volley.newRequestQueue(context).add(request)
+    }
+
+    private fun fetchAndSaveRecipeToLocal(recipeId: Int, db: UserDatabase) {
+        val url = "http://$ipAddress/cookMate/get_recipe_detail.php"
+
+        val request = object : StringRequest(
+            Method.POST, url,
+            { response ->
+                try {
+                    val json = JSONObject(response)
+                    if (json.getString("status") == "success") {
+                        val data = json.getJSONObject("data")
+
+                        // Parse images
+                        val imagesString = data.getString("images")
+                        val coverImage = try {
+                            val imagesArray = org.json.JSONArray(imagesString)
+                            if (imagesArray.length() > 0) {
+                                imagesArray.getString(0)
+                            } else {
+                                ""
+                            }
+                        } catch (e: Exception) {
+                            imagesString
+                        }
+
+                        val recipe = Recipe(
+                            recipeId = data.getInt("recipe_id"),
+                            title = data.getString("title"),
+                            description = data.getString("description"),
+                            tags = data.getString("tags"),
+                            imagePath = coverImage,
+                            likeCount = data.getInt("like_count"),
+                            downloadCount = data.getInt("download_count"),
+                            isLiked = data.getBoolean("is_liked"),
+                            isDownloaded = true,
+                            ownerId = data.getInt("user_id")
+                        )
+
+                        val downloadedAt = java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss", java.util.Locale.getDefault()).format(java.util.Date())
+                        db.saveDownloadedRecipe(recipe, currentUserId, downloadedAt)
+
+                        // Also cache full recipe details for offline viewing
+                        db.saveRecipeDetail(
+                            recipeId = data.getInt("recipe_id"),
+                            title = data.getString("title"),
+                            description = data.getString("description"),
+                            ingredients = data.getString("ingredients"),
+                            steps = data.getString("steps"),
+                            tags = data.getString("tags"),
+                            images = imagesString,
+                            likeCount = data.getInt("like_count"),
+                            downloadCount = data.getInt("download_count"),
+                            isLiked = data.getBoolean("is_liked"),
+                            isDownloaded = true,
+                            ownerId = data.getInt("user_id"),
+                            ownerUsername = data.getString("username"),
+                            ownerProfileImage = data.optString("profile_image", "")
+                        )
+                    }
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                }
+            },
+            { }
+        ) {
+            override fun getParams(): MutableMap<String, String> {
+                val params = HashMap<String, String>()
+                params["recipe_id"] = recipeId.toString()
+                params["user_id"] = currentUserId.toString()
                 return params
             }
         }

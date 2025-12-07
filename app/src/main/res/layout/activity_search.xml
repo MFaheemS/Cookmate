@@ -61,11 +61,32 @@
             android:layout_centerVertical="true" />
     </RelativeLayout>
 
+    <HorizontalScrollView
+        android:id="@+id/filter_chips_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/header_bar"
+        android:paddingLeft="16dp"
+        android:paddingRight="16dp"
+        android:paddingTop="8dp"
+        android:paddingBottom="8dp"
+        android:visibility="gone"
+        android:scrollbars="none">
+
+        <com.google.android.flexbox.FlexboxLayout
+            android:id="@+id/filter_chips_layout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:flexWrap="nowrap"
+            app:alignItems="center"
+            app:justifyContent="flex_start" />
+    </HorizontalScrollView>
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recycler_search_results"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@id/header_bar"
+        android:layout_below="@id/filter_chips_container"
         android:layout_above="@id/bottomNavigation"
         android:padding="16dp"
         android:clipToPadding="false" />

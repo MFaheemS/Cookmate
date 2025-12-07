@@ -208,19 +208,37 @@ class DownloadRecipeAdapter(
                 try {
                     val json = JSONObject(response)
                     if (json.getString("status") == "success") {
+                        val wasDownloaded = recipe.isDownloaded
                         recipe.isDownloaded = !recipe.isDownloaded
                         recipe.downloadCount = json.getInt("download_count")
+
+                        // Update local database
+                        if (recipe.isDownloaded) {
+                            // Save to local database
+                            val downloadedAt = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(Date())
+                            db.saveDownloadedRecipe(recipe, userId, downloadedAt)
+                        } else {
+                            // Remove from local database
+                            db.deleteDownloadedRecipe(recipe.recipeId, userId)
+                        }
 
                         animateIconChange(holder.iconDownload) {
                             updateDownloadIcon(holder.iconDownload, recipe.isDownloaded)
                         }
                         holder.txtDownloadCount.text = recipe.downloadCount.toString()
+
+                        if (!recipe.isDownloaded && wasDownloaded) {
+                            Toast.makeText(context, "Removed from downloads", Toast.LENGTH_SHORT).show()
+                        }
                     }
                 } catch (e: Exception) {
                     e.printStackTrace()
+                    Toast.makeText(context, "Error: ${e.message}", Toast.LENGTH_SHORT).show()
                 }
             },
-            Response.ErrorListener { }
+            Response.ErrorListener { error ->
+                Toast.makeText(context, "Network error: ${error.message}", Toast.LENGTH_SHORT).show()
+            }
         ) {
             override fun getParams(): MutableMap<String, String> {
                 val params = HashMap<String, String>()

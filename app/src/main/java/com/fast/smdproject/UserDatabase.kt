@@ -6,7 +6,7 @@ import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
 
 class UserDatabase(context: Context) :
-    SQLiteOpenHelper(context, "user_db", null, 4) { // Changed version to 4
+    SQLiteOpenHelper(context, "user_db", null, 8) { // Changed version to 8
 
     override fun onCreate(db: SQLiteDatabase) {
 
@@ -18,7 +18,10 @@ class UserDatabase(context: Context) :
                     "first_name TEXT," +
                     "last_name TEXT," +
                     "email TEXT," +
-                    "profile_image TEXT" +
+                    "profile_image TEXT," +
+                    "followers_count INTEGER DEFAULT 0," +
+                    "following_count INTEGER DEFAULT 0," +
+                    "uploads_count INTEGER DEFAULT 0" +
                     ")"
         )
 
@@ -26,6 +29,11 @@ class UserDatabase(context: Context) :
         createFollowersTable(db)
         createFollowingTable(db)
         createSyncInfoTable(db)
+        createDownloadedRecipesTable(db)
+        createRemindersTable(db)
+        createRecipeDetailsTable(db)
+        createUserUploadsTable(db)
+        createPendingActionsTable(db)
     }
 
     private fun createPendingTable(db: SQLiteDatabase) {
@@ -80,6 +88,97 @@ class UserDatabase(context: Context) :
         )
     }
 
+    private fun createDownloadedRecipesTable(db: SQLiteDatabase) {
+        db.execSQL(
+            "CREATE TABLE downloaded_recipes (" +
+                    "recipe_id INTEGER PRIMARY KEY," +
+                    "user_id INTEGER," +
+                    "title TEXT," +
+                    "description TEXT," +
+                    "tags TEXT," +
+                    "images TEXT," +
+                    "like_count INTEGER," +
+                    "download_count INTEGER," +
+                    "is_liked INTEGER," +
+                    "is_downloaded INTEGER," +
+                    "owner_id INTEGER," +
+                    "downloaded_at TEXT," +
+                    "synced INTEGER DEFAULT 1" +
+                    ")"
+        )
+    }
+
+    private fun createRemindersTable(db: SQLiteDatabase) {
+        db.execSQL(
+            "CREATE TABLE reminders (" +
+                    "id INTEGER PRIMARY KEY AUTOINCREMENT," +
+                    "recipe_id INTEGER," +
+                    "user_id INTEGER," +
+                    "recipe_title TEXT," +
+                    "reminder_time INTEGER," +
+                    "image_path TEXT," +
+                    "synced INTEGER DEFAULT 1," +
+                    "UNIQUE(recipe_id, user_id)" +
+                    ")"
+        )
+    }
+
+    private fun createRecipeDetailsTable(db: SQLiteDatabase) {
+        db.execSQL(
+            "CREATE TABLE recipe_details (" +
+                    "recipe_id INTEGER PRIMARY KEY," +
+                    "title TEXT," +
+                    "description TEXT," +
+                    "ingredients TEXT," +
+                    "steps TEXT," +
+                    "tags TEXT," +
+                    "images TEXT," +
+                    "like_count INTEGER," +
+                    "download_count INTEGER," +
+                    "is_liked INTEGER," +
+                    "is_downloaded INTEGER," +
+                    "owner_id INTEGER," +
+                    "owner_username TEXT," +
+                    "owner_profile_image TEXT," +
+                    "cached_at INTEGER" +
+                    ")"
+        )
+    }
+
+    private fun createUserUploadsTable(db: SQLiteDatabase) {
+        db.execSQL(
+            "CREATE TABLE user_uploads (" +
+                    "recipe_id INTEGER PRIMARY KEY," +
+                    "user_id INTEGER," +
+                    "title TEXT," +
+                    "description TEXT," +
+                    "ingredients TEXT," +
+                    "steps TEXT," +
+                    "tags TEXT," +
+                    "images TEXT," +
+                    "like_count INTEGER," +
+                    "download_count INTEGER," +
+                    "created_at TEXT," +
+                    "cached_at INTEGER" +
+                    ")"
+        )
+    }
+
+    private fun createPendingActionsTable(db: SQLiteDatabase) {
+        db.execSQL(
+            "CREATE TABLE pending_actions (" +
+                    "id INTEGER PRIMARY KEY AUTOINCREMENT," +
+                    "user_id INTEGER," +
+                    "action_type TEXT," +
+                    "target_id INTEGER," +
+                    "target_type TEXT," +
+                    "additional_data TEXT," +
+                    "created_at INTEGER," +
+                    "attempts INTEGER DEFAULT 0" +
+                    ")"
+        )
+    }
+
     override fun onUpgrade(db: SQLiteDatabase, oldV: Int, newV: Int) {
         if (oldV < 2) {
             createPendingTable(db)
@@ -93,18 +192,62 @@ class UserDatabase(context: Context) :
             createFollowingTable(db)
             createSyncInfoTable(db)
         }
+        if (oldV < 5) {
+            createDownloadedRecipesTable(db)
+            createRemindersTable(db)
+        }
+        if (oldV < 6) {
+            createRecipeDetailsTable(db)
+            createUserUploadsTable(db)
+        }
+        if (oldV < 7) {
+            // Add follower/following/uploads counts to user table
+            try {
+                db.execSQL("ALTER TABLE user ADD COLUMN followers_count INTEGER DEFAULT 0")
+                db.execSQL("ALTER TABLE user ADD COLUMN following_count INTEGER DEFAULT 0")
+                db.execSQL("ALTER TABLE user ADD COLUMN uploads_count INTEGER DEFAULT 0")
+            } catch (e: Exception) {
+                // Columns might already exist
+                e.printStackTrace()
+            }
+        }
+        if (oldV < 8) {
+            createPendingActionsTable(db)
+        }
     }
 
 
-    fun saveUser(userId: Int, username: String, first: String, last: String, email: String, image: String?) {
+    fun saveUser(userId: Int, username: String, first: String, last: String, email: String, image: String?, followersCount: Int = 0, followingCount: Int = 0, uploadsCount: Int = 0) {
         val db = writableDatabase
         db.execSQL("DELETE FROM user")
         val profileImage = image ?: ""
         db.execSQL(
-            "INSERT INTO user (user_id, username, first_name, last_name, email, profile_image) VALUES (?, ?, ?, ?, ?, ?)",
-            arrayOf<Any>(userId, username, first, last, email, profileImage)
+            "INSERT INTO user (user_id, username, first_name, last_name, email, profile_image, followers_count, following_count, uploads_count) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+            arrayOf<Any>(userId, username, first, last, email, profileImage, followersCount, followingCount, uploadsCount)
         )
         db.close()
+    }
+
+    fun updateUserCounts(followersCount: Int, followingCount: Int, uploadsCount: Int) {
+        val db = writableDatabase
+        db.execSQL("UPDATE user SET followers_count = ?, following_count = ?, uploads_count = ?", arrayOf<Any>(followersCount, followingCount, uploadsCount))
+        db.close()
+    }
+
+    fun getUserCounts(): Triple<Int, Int, Int> {
+        val db = readableDatabase
+        val cursor = db.rawQuery("SELECT followers_count, following_count, uploads_count FROM user LIMIT 1", null)
+        var counts = Triple(0, 0, 0)
+        if (cursor.moveToFirst()) {
+            counts = Triple(
+                cursor.getInt(0),
+                cursor.getInt(1),
+                cursor.getInt(2)
+            )
+        }
+        cursor.close()
+        db.close()
+        return counts
     }
 
     fun getCurrentUserId(): Int {
@@ -349,4 +492,366 @@ class UserDatabase(context: Context) :
         db.execSQL("DELETE FROM user")
         db.close()
     }
+
+    // Downloaded Recipes methods
+    fun saveDownloadedRecipe(recipe: Recipe, userId: Int, downloadedAt: String) {
+        val db = writableDatabase
+        val values = ContentValues().apply {
+            put("recipe_id", recipe.recipeId)
+            put("user_id", userId)
+            put("title", recipe.title)
+            put("description", recipe.description)
+            put("tags", recipe.tags)
+            put("images", recipe.imagePath)
+            put("like_count", recipe.likeCount)
+            put("download_count", recipe.downloadCount)
+            put("is_liked", if (recipe.isLiked) 1 else 0)
+            put("is_downloaded", if (recipe.isDownloaded) 1 else 0)
+            put("owner_id", recipe.ownerId)
+            put("downloaded_at", downloadedAt)
+            put("synced", 1)
+        }
+
+        db.insertWithOnConflict("downloaded_recipes", null, values, SQLiteDatabase.CONFLICT_REPLACE)
+        db.close()
+    }
+
+    fun getDownloadedRecipes(userId: Int): Pair<List<Recipe>, Map<Int, String>> {
+        val db = readableDatabase
+        val cursor = db.rawQuery(
+            "SELECT * FROM downloaded_recipes WHERE user_id = ? ORDER BY downloaded_at DESC",
+            arrayOf(userId.toString())
+        )
+
+        val recipes = mutableListOf<Recipe>()
+        val downloadTimes = mutableMapOf<Int, String>()
+
+        while (cursor.moveToNext()) {
+            val recipeId = cursor.getInt(cursor.getColumnIndexOrThrow("recipe_id"))
+            val recipe = Recipe(
+                recipeId = recipeId,
+                title = cursor.getString(cursor.getColumnIndexOrThrow("title")),
+                description = cursor.getString(cursor.getColumnIndexOrThrow("description")),
+                tags = cursor.getString(cursor.getColumnIndexOrThrow("tags")),
+                imagePath = cursor.getString(cursor.getColumnIndexOrThrow("images")),
+                likeCount = cursor.getInt(cursor.getColumnIndexOrThrow("like_count")),
+                downloadCount = cursor.getInt(cursor.getColumnIndexOrThrow("download_count")),
+                isLiked = cursor.getInt(cursor.getColumnIndexOrThrow("is_liked")) == 1,
+                isDownloaded = cursor.getInt(cursor.getColumnIndexOrThrow("is_downloaded")) == 1,
+                ownerId = cursor.getInt(cursor.getColumnIndexOrThrow("owner_id"))
+            )
+            recipes.add(recipe)
+            downloadTimes[recipeId] = cursor.getString(cursor.getColumnIndexOrThrow("downloaded_at"))
+        }
+
+        cursor.close()
+        db.close()
+        return Pair(recipes, downloadTimes)
+    }
+
+    fun deleteDownloadedRecipe(recipeId: Int, userId: Int) {
+        val db = writableDatabase
+        db.delete("downloaded_recipes", "recipe_id = ? AND user_id = ?", arrayOf(recipeId.toString(), userId.toString()))
+        db.close()
+    }
+
+    fun clearDownloadedRecipes(userId: Int) {
+        val db = writableDatabase
+        db.delete("downloaded_recipes", "user_id = ?", arrayOf(userId.toString()))
+        db.close()
+    }
+
+    fun updateDownloadedRecipesSyncStatus(userId: Int) {
+        val db = writableDatabase
+        val currentTime = System.currentTimeMillis()
+        db.execSQL("DELETE FROM sync_info WHERE type = 'downloaded_recipes'")
+        db.execSQL("INSERT INTO sync_info (type, last_sync_time) VALUES ('downloaded_recipes', ?)", arrayOf<Any>(currentTime))
+        db.close()
+    }
+
+    // Reminders methods
+    fun saveReminder(reminder: Reminder, userId: Int) {
+        val db = writableDatabase
+        val values = ContentValues().apply {
+            put("recipe_id", reminder.recipeId)
+            put("user_id", userId)
+            put("recipe_title", reminder.recipeTitle)
+            put("reminder_time", reminder.timeInMillis)
+            put("image_path", reminder.imagePath)
+            put("synced", 1)
+        }
+
+        db.insertWithOnConflict("reminders", null, values, SQLiteDatabase.CONFLICT_REPLACE)
+        db.close()
+    }
+
+    fun getReminders(userId: Int): List<Reminder> {
+        val db = readableDatabase
+        val currentTime = System.currentTimeMillis()
+        val cursor = db.rawQuery(
+            "SELECT DISTINCT recipe_id, recipe_title, reminder_time, image_path FROM reminders WHERE user_id = ? AND reminder_time > ? ORDER BY reminder_time ASC",
+            arrayOf(userId.toString(), currentTime.toString())
+        )
+
+        val reminders = mutableListOf<Reminder>()
+        val seenRecipeIds = mutableSetOf<Int>()
+
+        while (cursor.moveToNext()) {
+            val recipeId = cursor.getInt(cursor.getColumnIndexOrThrow("recipe_id"))
+            // Ensure uniqueness by recipe_id
+            if (!seenRecipeIds.contains(recipeId)) {
+                seenRecipeIds.add(recipeId)
+                val reminder = Reminder(
+                    recipeId = recipeId,
+                    recipeTitle = cursor.getString(cursor.getColumnIndexOrThrow("recipe_title")),
+                    timeInMillis = cursor.getLong(cursor.getColumnIndexOrThrow("reminder_time")),
+                    imagePath = cursor.getString(cursor.getColumnIndexOrThrow("image_path")) ?: ""
+                )
+                reminders.add(reminder)
+            }
+        }
+
+        cursor.close()
+        db.close()
+        return reminders
+    }
+
+    fun deleteReminder(recipeId: Int, userId: Int) {
+        val db = writableDatabase
+        db.delete("reminders", "recipe_id = ? AND user_id = ?", arrayOf(recipeId.toString(), userId.toString()))
+        db.close()
+    }
+
+    fun deleteExpiredReminders(userId: Int) {
+        val db = writableDatabase
+        val currentTime = System.currentTimeMillis()
+        db.delete("reminders", "user_id = ? AND reminder_time <= ?", arrayOf(userId.toString(), currentTime.toString()))
+        db.close()
+    }
+
+    fun updateRemindersSyncStatus(userId: Int) {
+        val db = writableDatabase
+        val currentTime = System.currentTimeMillis()
+        db.execSQL("DELETE FROM sync_info WHERE type = 'reminders'")
+        db.execSQL("INSERT INTO sync_info (type, last_sync_time) VALUES ('reminders', ?)", arrayOf<Any>(currentTime))
+        db.close()
+    }
+
+    // Recipe Details methods (full recipe data for offline viewing)
+    fun saveRecipeDetail(
+        recipeId: Int,
+        title: String,
+        description: String,
+        ingredients: String,
+        steps: String,
+        tags: String,
+        images: String,
+        likeCount: Int,
+        downloadCount: Int,
+        isLiked: Boolean,
+        isDownloaded: Boolean,
+        ownerId: Int,
+        ownerUsername: String,
+        ownerProfileImage: String
+    ) {
+        val db = writableDatabase
+        val values = ContentValues().apply {
+            put("recipe_id", recipeId)
+            put("title", title)
+            put("description", description)
+            put("ingredients", ingredients)
+            put("steps", steps)
+            put("tags", tags)
+            put("images", images)
+            put("like_count", likeCount)
+            put("download_count", downloadCount)
+            put("is_liked", if (isLiked) 1 else 0)
+            put("is_downloaded", if (isDownloaded) 1 else 0)
+            put("owner_id", ownerId)
+            put("owner_username", ownerUsername)
+            put("owner_profile_image", ownerProfileImage)
+            put("cached_at", System.currentTimeMillis())
+        }
+
+        db.insertWithOnConflict("recipe_details", null, values, SQLiteDatabase.CONFLICT_REPLACE)
+        db.close()
+    }
+
+    fun getRecipeDetail(recipeId: Int): HashMap<String, String>? {
+        val db = readableDatabase
+        val cursor = db.rawQuery(
+            "SELECT * FROM recipe_details WHERE recipe_id = ?",
+            arrayOf(recipeId.toString())
+        )
+
+        var recipeMap: HashMap<String, String>? = null
+
+        if (cursor.moveToFirst()) {
+            recipeMap = HashMap<String, String>().apply {
+                put("recipe_id", cursor.getInt(cursor.getColumnIndexOrThrow("recipe_id")).toString())
+                put("title", cursor.getString(cursor.getColumnIndexOrThrow("title")) ?: "")
+                put("description", cursor.getString(cursor.getColumnIndexOrThrow("description")) ?: "")
+                put("ingredients", cursor.getString(cursor.getColumnIndexOrThrow("ingredients")) ?: "")
+                put("steps", cursor.getString(cursor.getColumnIndexOrThrow("steps")) ?: "")
+                put("tags", cursor.getString(cursor.getColumnIndexOrThrow("tags")) ?: "")
+                put("images", cursor.getString(cursor.getColumnIndexOrThrow("images")) ?: "")
+                put("like_count", cursor.getInt(cursor.getColumnIndexOrThrow("like_count")).toString())
+                put("download_count", cursor.getInt(cursor.getColumnIndexOrThrow("download_count")).toString())
+                put("is_liked", cursor.getInt(cursor.getColumnIndexOrThrow("is_liked")).toString())
+                put("is_downloaded", cursor.getInt(cursor.getColumnIndexOrThrow("is_downloaded")).toString())
+                put("owner_id", cursor.getInt(cursor.getColumnIndexOrThrow("owner_id")).toString())
+                put("owner_username", cursor.getString(cursor.getColumnIndexOrThrow("owner_username")) ?: "")
+                put("owner_profile_image", cursor.getString(cursor.getColumnIndexOrThrow("owner_profile_image")) ?: "")
+            }
+        }
+
+        cursor.close()
+        db.close()
+        return recipeMap
+    }
+
+    fun deleteRecipeDetail(recipeId: Int) {
+        val db = writableDatabase
+        db.delete("recipe_details", "recipe_id = ?", arrayOf(recipeId.toString()))
+        db.close()
+    }
+
+    // User Uploads methods
+    fun saveUserUpload(
+        recipeId: Int,
+        userId: Int,
+        title: String,
+        description: String,
+        ingredients: String,
+        steps: String,
+        tags: String,
+        images: String,
+        likeCount: Int,
+        downloadCount: Int,
+        createdAt: String
+    ) {
+        val db = writableDatabase
+        val values = ContentValues().apply {
+            put("recipe_id", recipeId)
+            put("user_id", userId)
+            put("title", title)
+            put("description", description)
+            put("ingredients", ingredients)
+            put("steps", steps)
+            put("tags", tags)
+            put("images", images)
+            put("like_count", likeCount)
+            put("download_count", downloadCount)
+            put("created_at", createdAt)
+            put("cached_at", System.currentTimeMillis())
+        }
+
+        db.insertWithOnConflict("user_uploads", null, values, SQLiteDatabase.CONFLICT_REPLACE)
+        db.close()
+    }
+
+    fun getUserUploads(userId: Int): List<HashMap<String, String>> {
+        val db = readableDatabase
+        val cursor = db.rawQuery(
+            "SELECT * FROM user_uploads WHERE user_id = ? ORDER BY cached_at DESC",
+            arrayOf(userId.toString())
+        )
+
+        val uploads = mutableListOf<HashMap<String, String>>()
+
+        while (cursor.moveToNext()) {
+            val recipeMap = HashMap<String, String>().apply {
+                put("recipe_id", cursor.getInt(cursor.getColumnIndexOrThrow("recipe_id")).toString())
+                put("title", cursor.getString(cursor.getColumnIndexOrThrow("title")) ?: "")
+                put("description", cursor.getString(cursor.getColumnIndexOrThrow("description")) ?: "")
+                put("ingredients", cursor.getString(cursor.getColumnIndexOrThrow("ingredients")) ?: "")
+                put("steps", cursor.getString(cursor.getColumnIndexOrThrow("steps")) ?: "")
+                put("tags", cursor.getString(cursor.getColumnIndexOrThrow("tags")) ?: "")
+                put("images", cursor.getString(cursor.getColumnIndexOrThrow("images")) ?: "")
+                put("like_count", cursor.getInt(cursor.getColumnIndexOrThrow("like_count")).toString())
+                put("download_count", cursor.getInt(cursor.getColumnIndexOrThrow("download_count")).toString())
+                put("created_at", cursor.getString(cursor.getColumnIndexOrThrow("created_at")) ?: "")
+            }
+            uploads.add(recipeMap)
+        }
+
+        cursor.close()
+        db.close()
+        return uploads
+    }
+
+    fun clearUserUploads(userId: Int) {
+        val db = writableDatabase
+        db.delete("user_uploads", "user_id = ?", arrayOf(userId.toString()))
+        db.close()
+    }
+
+    fun deleteUserUpload(recipeId: Int) {
+        val db = writableDatabase
+        db.delete("user_uploads", "recipe_id = ?", arrayOf(recipeId.toString()))
+        db.close()
+    }
+
+    // Pending Actions Queue Methods
+    fun queueAction(userId: Int, actionType: String, targetId: Int, targetType: String, additionalData: String = "") {
+        val db = writableDatabase
+        val values = ContentValues().apply {
+            put("user_id", userId)
+            put("action_type", actionType)
+            put("target_id", targetId)
+            put("target_type", targetType)
+            put("additional_data", additionalData)
+            put("created_at", System.currentTimeMillis())
+            put("attempts", 0)
+        }
+
+        db.insert("pending_actions", null, values)
+        db.close()
+    }
+
+    fun getPendingActions(userId: Int): List<HashMap<String, String>> {
+        val db = readableDatabase
+        val cursor = db.rawQuery(
+            "SELECT * FROM pending_actions WHERE user_id = ? ORDER BY created_at ASC",
+            arrayOf(userId.toString())
+        )
+
+        val actions = mutableListOf<HashMap<String, String>>()
+
+        while (cursor.moveToNext()) {
+            val actionMap = HashMap<String, String>().apply {
+                put("id", cursor.getInt(cursor.getColumnIndexOrThrow("id")).toString())
+                put("action_type", cursor.getString(cursor.getColumnIndexOrThrow("action_type")) ?: "")
+                put("target_id", cursor.getInt(cursor.getColumnIndexOrThrow("target_id")).toString())
+                put("target_type", cursor.getString(cursor.getColumnIndexOrThrow("target_type")) ?: "")
+                put("additional_data", cursor.getString(cursor.getColumnIndexOrThrow("additional_data")) ?: "")
+                put("attempts", cursor.getInt(cursor.getColumnIndexOrThrow("attempts")).toString())
+            }
+            actions.add(actionMap)
+        }
+
+        cursor.close()
+        db.close()
+        return actions
+    }
+
+    fun deletePendingAction(actionId: Int) {
+        val db = writableDatabase
+        db.delete("pending_actions", "id = ?", arrayOf(actionId.toString()))
+        db.close()
+    }
+
+    fun incrementActionAttempts(actionId: Int) {
+        val db = writableDatabase
+        db.execSQL("UPDATE pending_actions SET attempts = attempts + 1 WHERE id = ?", arrayOf<Any>(actionId))
+        db.close()
+    }
+
+    fun clearOldPendingActions(userId: Int, olderThanDays: Int = 7) {
+        val db = writableDatabase
+        val cutoffTime = System.currentTimeMillis() - (olderThanDays * 24 * 60 * 60 * 1000L)
+        db.delete("pending_actions", "user_id = ? AND created_at < ?", arrayOf(userId.toString(), cutoffTime.toString()))
+        db.close()
+    }
 }
+
