@@ -6,13 +6,14 @@
     android:layout_margin="8dp"
     app:cardCornerRadius="16dp"
     app:cardElevation="4dp"
-    app:cardBackgroundColor="#66BB6A">
+    android:background="@drawable/recipe_card_gradient_bg">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="12dp">
+        android:padding="12dp"
+        android:background="@drawable/recipe_card_gradient_bg">
 
         <!-- Recipe Image with Rounded Corners -->
         <androidx.cardview.widget.CardView

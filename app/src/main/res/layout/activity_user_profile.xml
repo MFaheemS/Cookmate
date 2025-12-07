@@ -242,50 +242,126 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 
-        <ImageButton
-            android:id="@+id/home"
-            android:layout_width="28dp"
-            android:layout_height="28dp"
-            android:src="@drawable/ic_home"
+        <LinearLayout
+            android:id="@+id/nav_home_container"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
             android:layout_weight="1"
-            android:layout_marginHorizontal="16dp"
-            android:background="@android:color/transparent"/>
+            android:orientation="vertical"
+            android:gravity="center">
 
-        <ImageButton
-            android:id="@+id/search"
-            android:layout_width="28dp"
-            android:layout_height="28dp"
-            android:src="@drawable/ic_search"
-            android:layout_marginHorizontal="16dp"
-            android:layout_weight="1"
-            android:background="@android:color/transparent"/>
+            <ImageButton
+                android:id="@+id/home"
+                android:layout_width="28dp"
+                android:layout_height="28dp"
+                android:src="@drawable/ic_home"
+                android:background="@android:color/transparent"/>
 
-        <ImageButton
-            android:id="@+id/upload"
-            android:layout_width="28dp"
-            android:layout_height="28dp"
-            android:src="@drawable/ic_upload"
-            android:layout_marginHorizontal="16dp"
-            android:layout_weight="1"
-            android:background="@android:color/transparent"/>
+            <View
+                android:id="@+id/nav_home_indicator"
+                android:layout_width="30dp"
+                android:layout_height="3dp"
+                android:layout_marginTop="4dp"
+                android:background="#F44336"
+                android:visibility="gone"/>
+        </LinearLayout>
 
-        <ImageButton
-            android:id="@+id/lib"
-            android:layout_width="28dp"
-            android:layout_height="28dp"
-            android:src="@drawable/ic_library"
-            android:layout_marginHorizontal="16dp"
+        <LinearLayout
+            android:id="@+id/nav_search_container"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
             android:layout_weight="1"
-            android:background="@android:color/transparent"/>
+            android:orientation="vertical"
+            android:gravity="center">
 
-        <ImageButton
-            android:layout_width="28dp"
-            android:layout_height="28dp"
-            android:src="@drawable/ic_profile"
-            android:layout_marginHorizontal="16dp"
+            <ImageButton
+                android:id="@+id/search"
+                android:layout_width="28dp"
+                android:layout_height="28dp"
+                android:src="@drawable/ic_search"
+                android:background="@android:color/transparent"/>
+
+            <View
+                android:id="@+id/nav_search_indicator"
+                android:layout_width="30dp"
+                android:layout_height="3dp"
+                android:layout_marginTop="4dp"
+                android:background="#F44336"
+                android:visibility="gone"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/nav_upload_container"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
             android:layout_weight="1"
-            android:background="@android:color/transparent"
-            app:tint="@color/black"/>
+            android:orientation="vertical"
+            android:gravity="center">
+
+            <ImageButton
+                android:id="@+id/upload"
+                android:layout_width="28dp"
+                android:layout_height="28dp"
+                android:src="@drawable/ic_upload"
+                android:background="@android:color/transparent"/>
+
+            <View
+                android:id="@+id/nav_upload_indicator"
+                android:layout_width="30dp"
+                android:layout_height="3dp"
+                android:layout_marginTop="4dp"
+                android:background="#F44336"
+                android:visibility="gone"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/nav_lib_container"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:gravity="center">
+
+            <ImageButton
+                android:id="@+id/lib"
+                android:layout_width="28dp"
+                android:layout_height="28dp"
+                android:src="@drawable/ic_library"
+                android:background="@android:color/transparent"/>
+
+            <View
+                android:id="@+id/nav_lib_indicator"
+                android:layout_width="30dp"
+                android:layout_height="3dp"
+                android:layout_marginTop="4dp"
+                android:background="#F44336"
+                android:visibility="gone"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/nav_profile_container"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:gravity="center">
+
+            <ImageButton
+                android:id="@+id/profile_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@android:color/transparent"
+                android:src="@drawable/ic_profile"
+                app:tint="@color/bg_light" />
+
+            <View
+                android:id="@+id/nav_profile_indicator"
+                android:layout_width="30dp"
+                android:layout_height="3dp"
+                android:layout_marginTop="4dp"
+                android:background="#F44336"
+                android:visibility="visible"/>
+        </LinearLayout>
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -107,26 +107,20 @@ class SecondUserProfileActivity : AppCompatActivity() {
     }
 
     private fun setupNavigation() {
-        // Bottom navigation - it's a LinearLayout with ImageButtons
-        val bottomNav = findViewById<android.widget.LinearLayout>(R.id.bottomNav)
+        val btnHome = findViewById<android.widget.ImageButton>(R.id.home)
+        val btnSearch = findViewById<android.widget.ImageButton>(R.id.search)
+        val btnUpload = findViewById<android.widget.ImageButton>(R.id.upload)
+        val btnLib = findViewById<android.widget.ImageButton>(R.id.lib)
+        val btnProfile = findViewById<android.widget.ImageButton>(R.id.profile)
 
-        // Get all ImageButtons
-        val navButtons = mutableListOf<android.widget.ImageButton>()
-        for (i in 0 until bottomNav.childCount) {
-            val child = bottomNav.getChildAt(i)
-            if (child is android.widget.ImageButton) {
-                navButtons.add(child)
-            }
-        }
+        // Set search indicator as active (current page)
+        showNavIndicator(R.id.nav_search_indicator)
 
-        // Setup click listeners (order: home, search, upload, lib, profile)
-        if (navButtons.size >= 5) {
-            navButtons[0].setOnClickListener { startActivity(Intent(this, HomePage::class.java)) }
-            navButtons[1].setOnClickListener { startActivity(Intent(this, SearchUserActivity::class.java)) }
-            navButtons[2].setOnClickListener { startActivity(Intent(this, UploadRecipe::class.java)) }
-            navButtons[3].setOnClickListener { startActivity(Intent(this, DownloadsActivity::class.java)) }
-            navButtons[4].setOnClickListener { startActivity(Intent(this, UserProfileActivity::class.java)) }
-        }
+        btnHome.setOnClickListener { startActivity(Intent(this, HomePage::class.java)) }
+        btnSearch.setOnClickListener { startActivity(Intent(this, SearchUserActivity::class.java)) }
+        btnUpload.setOnClickListener { startActivity(Intent(this, UploadRecipe::class.java)) }
+        btnLib.setOnClickListener { startActivity(Intent(this, DownloadsActivity::class.java)) }
+        btnProfile.setOnClickListener { startActivity(Intent(this, UserProfileActivity::class.java)) }
     }
 
     private fun fetchUserProfile() {
@@ -331,5 +325,35 @@ class SecondUserProfileActivity : AppCompatActivity() {
             followButton.setBackgroundResource(R.drawable.light_green_bg)
         }
     }
-}
 
+    private fun showNavIndicator(indicatorId: Int) {
+        val indicators = listOf(
+            R.id.nav_home_indicator,
+            R.id.nav_search_indicator,
+            R.id.nav_upload_indicator,
+            R.id.nav_lib_indicator,
+            R.id.nav_profile_indicator
+        )
+
+        indicators.forEach { id ->
+            findViewById<android.view.View>(id)?.let { indicator ->
+                if (id == indicatorId) {
+                    indicator.visibility = android.view.View.VISIBLE
+                    indicator.alpha = 0f
+                    indicator.animate()
+                        .alpha(1f)
+                        .setDuration(300)
+                        .start()
+                } else {
+                    indicator.animate()
+                        .alpha(0f)
+                        .setDuration(200)
+                        .withEndAction {
+                            indicator.visibility = android.view.View.GONE
+                        }
+                        .start()
+                }
+            }
+        }
+    }
+}

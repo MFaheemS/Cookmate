@@ -54,6 +54,9 @@ class DownloadsActivity : AppCompatActivity() {
         setActiveButton(downloadBtn, true)
         setActiveButton(favoriteBtn, false)
 
+        // Set library indicator as active (current page)
+        showNavIndicator(R.id.nav_lib_indicator)
+
         // Setup search functionality
         setupSearch()
 
@@ -254,5 +257,36 @@ class DownloadsActivity : AppCompatActivity() {
         )
 
         Volley.newRequestQueue(this).add(request)
+    }
+
+    private fun showNavIndicator(indicatorId: Int) {
+        val indicators = listOf(
+            R.id.nav_home_indicator,
+            R.id.nav_search_indicator,
+            R.id.nav_upload_indicator,
+            R.id.nav_lib_indicator,
+            R.id.nav_profile_indicator
+        )
+
+        indicators.forEach { id ->
+            findViewById<android.view.View>(id)?.let { indicator ->
+                if (id == indicatorId) {
+                    indicator.visibility = android.view.View.VISIBLE
+                    indicator.alpha = 0f
+                    indicator.animate()
+                        .alpha(1f)
+                        .setDuration(300)
+                        .start()
+                } else {
+                    indicator.animate()
+                        .alpha(0f)
+                        .setDuration(200)
+                        .withEndAction {
+                            indicator.visibility = android.view.View.GONE
+                        }
+                        .start()
+                }
+            }
+        }
     }
 }

@@ -18,6 +18,7 @@
             android:layout_width="32dp"
             android:layout_height="32dp"
             android:src="@drawable/ic_back"
+            android:tint="@color/white"
             android:layout_alignParentLeft="true"
             android:layout_centerVertical="true" />
 
@@ -104,49 +105,110 @@
         android:weightSum="5">
 
         <LinearLayout
+            android:id="@+id/nav_home_container"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
+            android:orientation="vertical"
             android:gravity="center">
-            <ImageView android:layout_width="28dp" android:layout_height="28dp" android:src="@drawable/home"
-                android:id="@+id/home"/>
+            <ImageView
+                android:id="@+id/home"
+                android:layout_width="28dp"
+                android:layout_height="28dp"
+                android:src="@drawable/home"/>
+            <View
+                android:id="@+id/nav_home_indicator"
+                android:layout_width="30dp"
+                android:layout_height="3dp"
+                android:layout_marginTop="4dp"
+                android:background="#F44336"
+                android:visibility="gone"/>
         </LinearLayout>
 
         <LinearLayout
+            android:id="@+id/nav_search_container"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
+            android:orientation="vertical"
             android:gravity="center">
-            <ImageView android:layout_width="28dp" android:layout_height="28dp" android:src="@drawable/search"
+            <ImageView
                 android:id="@+id/search"
-                app:tint="@color/black"/>
+                android:layout_width="28dp"
+                android:layout_height="28dp"
+                android:src="@drawable/search"
+                app:tint="@color/white"/>
+            <View
+                android:id="@+id/nav_search_indicator"
+                android:layout_width="30dp"
+                android:layout_height="3dp"
+                android:layout_marginTop="4dp"
+                android:background="#F44336"
+                android:visibility="visible"/>
         </LinearLayout>
 
         <LinearLayout
+            android:id="@+id/nav_upload_container"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
+            android:orientation="vertical"
             android:gravity="center">
-            <ImageView android:layout_width="28dp" android:layout_height="28dp" android:src="@drawable/add"
-                android:id="@+id/upload"/>
+            <ImageView
+                android:id="@+id/upload"
+                android:layout_width="28dp"
+                android:layout_height="28dp"
+                android:src="@drawable/add"/>
+            <View
+                android:id="@+id/nav_upload_indicator"
+                android:layout_width="30dp"
+                android:layout_height="3dp"
+                android:layout_marginTop="4dp"
+                android:background="#F44336"
+                android:visibility="gone"/>
         </LinearLayout>
 
         <LinearLayout
+            android:id="@+id/nav_lib_container"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
+            android:orientation="vertical"
             android:gravity="center">
-            <ImageView android:layout_width="28dp" android:layout_height="28dp" android:src="@drawable/ic_library"
-                android:id="@+id/lib"/>
+            <ImageView
+                android:id="@+id/lib"
+                android:layout_width="28dp"
+                android:layout_height="28dp"
+                android:src="@drawable/ic_library"/>
+            <View
+                android:id="@+id/nav_lib_indicator"
+                android:layout_width="30dp"
+                android:layout_height="3dp"
+                android:layout_marginTop="4dp"
+                android:background="#F44336"
+                android:visibility="gone"/>
         </LinearLayout>
 
         <LinearLayout
+            android:id="@+id/nav_profile_container"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
+            android:orientation="vertical"
             android:gravity="center">
-            <ImageView android:layout_width="28dp" android:layout_height="28dp" android:src="@drawable/profile" app:tint="@color/white"
-                android:id="@+id/profile"/>
+            <ImageView
+                android:id="@+id/profile"
+                android:layout_width="28dp"
+                android:layout_height="28dp"
+                android:src="@drawable/profile"
+                app:tint="@color/white"/>
+            <View
+                android:id="@+id/nav_profile_indicator"
+                android:layout_width="30dp"
+                android:layout_height="3dp"
+                android:layout_marginTop="4dp"
+                android:background="#F44336"
+                android:visibility="gone"/>
         </LinearLayout>
     </LinearLayout>
 

@@ -32,7 +32,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="CookMade"
+                android:text="CookMate"
                 android:textColor="#7CB342"
                 android:textSize="20sp"
                 android:textStyle="bold"
@@ -87,6 +87,7 @@
 
         <!-- Home -->
         <LinearLayout
+            android:id="@+id/nav_home_container"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
@@ -100,10 +101,18 @@
                 android:layout_height="28dp"
                 android:src="@drawable/home" />
 
+            <View
+                android:id="@+id/nav_home_indicator"
+                android:layout_width="30dp"
+                android:layout_height="3dp"
+                android:layout_marginTop="4dp"
+                android:background="#F44336"
+                android:visibility="gone"/>
         </LinearLayout>
 
         <!-- Search -->
         <LinearLayout
+            android:id="@+id/nav_search_container"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
@@ -117,10 +126,18 @@
                 android:layout_height="28dp"
                 android:src="@drawable/search" />
 
+            <View
+                android:id="@+id/nav_search_indicator"
+                android:layout_width="30dp"
+                android:layout_height="3dp"
+                android:layout_marginTop="4dp"
+                android:background="#F44336"
+                android:visibility="gone"/>
         </LinearLayout>
 
         <!-- Add/Create -->
         <LinearLayout
+            android:id="@+id/nav_upload_container"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
@@ -134,10 +151,18 @@
                 android:layout_height="28dp"
                 android:src="@drawable/add" />
 
+            <View
+                android:id="@+id/nav_upload_indicator"
+                android:layout_width="30dp"
+                android:layout_height="3dp"
+                android:layout_marginTop="4dp"
+                android:background="#F44336"
+                android:visibility="gone"/>
         </LinearLayout>
 
         <!-- Messages/Documents -->
         <LinearLayout
+            android:id="@+id/nav_lib_container"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
@@ -152,10 +177,18 @@
                 android:src="@drawable/ic_library"
                 app:tint="@color/white" />
 
+            <View
+                android:id="@+id/nav_lib_indicator"
+                android:layout_width="30dp"
+                android:layout_height="3dp"
+                android:layout_marginTop="4dp"
+                android:background="#F44336"
+                android:visibility="visible"/>
         </LinearLayout>
 
         <!-- Profile -->
         <LinearLayout
+            android:id="@+id/nav_profile_container"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
@@ -168,8 +201,15 @@
                 android:layout_width="28dp"
                 android:layout_height="28dp"
                 android:src="@drawable/profile"
-                app:tint="@color/black" />
+                app:tint="@color/bg_light" />
 
+            <View
+                android:id="@+id/nav_profile_indicator"
+                android:layout_width="30dp"
+                android:layout_height="3dp"
+                android:layout_marginTop="4dp"
+                android:background="#F44336"
+                android:visibility="gone"/>
         </LinearLayout>
 
     </LinearLayout>

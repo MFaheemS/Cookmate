@@ -52,6 +52,19 @@
             android:cursorVisible="false"/>
     </RelativeLayout>
 
+    <!-- Falling Leaves Container (overlays header) -->
+    <FrameLayout
+        android:id="@+id/falling_leaves_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignTop="@id/header"
+        android:layout_alignBottom="@id/header"
+        android:clipChildren="false"
+        android:clipToPadding="false"
+        android:elevation="10dp"
+        android:clickable="false"
+        android:focusable="false"/>
+
     <!-- Recommended For You Section with Border -->
     <LinearLayout
         android:id="@+id/recommended_section"
@@ -127,8 +140,8 @@
         android:paddingStart="0dp"
         android:paddingEnd="0dp"
         android:paddingBottom="16dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginEnd="16dp"
+        android:layout_marginStart="12dp"
+        android:layout_marginEnd="12dp"
         android:background="@drawable/recipes_container_border"
         android:clipToPadding="false" />
 
@@ -145,23 +158,109 @@
         android:weightSum="5">
 
         <LinearLayout
+            android:id="@+id/nav_home_container"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
+            android:orientation="vertical"
             android:gravity="center">
-            <ImageView android:layout_width="28dp" android:layout_height="28dp" android:src="@drawable/home" app:tint="@color/black"/>
+            <ImageView
+                android:layout_width="28dp"
+                android:layout_height="28dp"
+                android:src="@drawable/home"
+                app:tint="@color/bg_light"/>
+            <View
+                android:id="@+id/nav_home_indicator"
+                android:layout_width="30dp"
+                android:layout_height="3dp"
+                android:layout_marginTop="4dp"
+                android:background="#F44336"
+                android:visibility="visible"/>
         </LinearLayout>
-        <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:gravity="center">
-            <ImageView android:id="@+id/search" android:layout_width="28dp" android:layout_height="28dp" android:src="@drawable/search"/>
+
+        <LinearLayout
+            android:id="@+id/nav_search_container"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:gravity="center">
+            <ImageView
+                android:id="@+id/search"
+                android:layout_width="28dp"
+                android:layout_height="28dp"
+                android:src="@drawable/search"/>
+            <View
+                android:id="@+id/nav_search_indicator"
+                android:layout_width="30dp"
+                android:layout_height="3dp"
+                android:layout_marginTop="4dp"
+                android:background="#F44336"
+                android:visibility="gone"/>
         </LinearLayout>
-        <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:gravity="center">
-            <ImageView android:id="@+id/upload" android:layout_width="28dp" android:layout_height="28dp" android:src="@drawable/add"/>
+
+        <LinearLayout
+            android:id="@+id/nav_upload_container"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:gravity="center">
+            <ImageView
+                android:id="@+id/upload"
+                android:layout_width="28dp"
+                android:layout_height="28dp"
+                android:src="@drawable/add"/>
+            <View
+                android:id="@+id/nav_upload_indicator"
+                android:layout_width="30dp"
+                android:layout_height="3dp"
+                android:layout_marginTop="4dp"
+                android:background="#F44336"
+                android:visibility="gone"/>
         </LinearLayout>
-        <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:gravity="center">
-            <ImageView android:id="@+id/lib" android:layout_width="28dp" android:layout_height="28dp" android:src="@drawable/ic_library"/>
+
+        <LinearLayout
+            android:id="@+id/nav_lib_container"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:gravity="center">
+            <ImageView
+                android:id="@+id/lib"
+                android:layout_width="28dp"
+                android:layout_height="28dp"
+                android:src="@drawable/ic_library"/>
+            <View
+                android:id="@+id/nav_lib_indicator"
+                android:layout_width="30dp"
+                android:layout_height="3dp"
+                android:layout_marginTop="4dp"
+                android:background="#F44336"
+                android:visibility="gone"/>
         </LinearLayout>
-        <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:gravity="center">
-            <ImageView android:id="@+id/profile" android:layout_width="28dp" android:layout_height="28dp" android:src="@drawable/profile" app:tint="@color/white"/>
+
+        <LinearLayout
+            android:id="@+id/nav_profile_container"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:gravity="center">
+            <ImageView
+                android:id="@+id/profile"
+                android:layout_width="28dp"
+                android:layout_height="28dp"
+                android:src="@drawable/profile"
+                app:tint="@color/white"/>
+            <View
+                android:id="@+id/nav_profile_indicator"
+                android:layout_width="30dp"
+                android:layout_height="3dp"
+                android:layout_marginTop="4dp"
+                android:background="#F44336"
+                android:visibility="gone"/>
         </LinearLayout>
     </LinearLayout>
 

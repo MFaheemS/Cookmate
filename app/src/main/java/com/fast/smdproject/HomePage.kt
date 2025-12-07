@@ -19,6 +19,7 @@ class HomePage : AppCompatActivity() {
     private lateinit var recyclerView: RecyclerView
     private lateinit var recipeAdapter: RecipeAdapter
     private val recipeList = ArrayList<Recipe>()
+    private var fallingLeavesAnimation: FallingLeavesAnimation? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -29,6 +30,12 @@ class HomePage : AppCompatActivity() {
 
         // Check for new notifications
         checkForNotifications()
+
+        // Set home indicator as active (current page)
+        showNavIndicator(R.id.nav_home_indicator)
+
+        // Initialize falling leaves animation
+        initializeFallingLeaves()
 
         // Bottom Nav Setup
         val btnSearch = findViewById<ImageView>(R.id.search)
@@ -64,8 +71,71 @@ class HomePage : AppCompatActivity() {
         recyclerView = findViewById(R.id.recycler_view_recipes)
         recyclerView.layoutManager = LinearLayoutManager(this)
 
+        // Animate Recommended text periodically
+        animateRecommendedText()
+
         // Fetch Data
         fetchRecipes()
+    }
+
+    private fun animateRecommendedText() {
+        val recommendedTitle = findViewById<android.widget.TextView>(R.id.recommended_title)
+
+        // Create periodic animation (every 3 seconds for more frequent animation)
+        val handler = android.os.Handler(android.os.Looper.getMainLooper())
+        val animationRunnable = object : Runnable {
+            override fun run() {
+                // Bounce animation
+                recommendedTitle.animate()
+                    .scaleX(1.15f)
+                    .scaleY(1.15f)
+                    .setDuration(200)
+                    .withEndAction {
+                        recommendedTitle.animate()
+                            .scaleX(1.0f)
+                            .scaleY(1.0f)
+                            .setDuration(200)
+                            .start()
+                    }
+                    .start()
+
+                // Shake animation (slight rotation)
+                recommendedTitle.animate()
+                    .rotation(5f)
+                    .setDuration(100)
+                    .withEndAction {
+                        recommendedTitle.animate()
+                            .rotation(-5f)
+                            .setDuration(100)
+                            .withEndAction {
+                                recommendedTitle.animate()
+                                    .rotation(3f)
+                                    .setDuration(100)
+                                    .withEndAction {
+                                        recommendedTitle.animate()
+                                            .rotation(-3f)
+                                            .setDuration(100)
+                                            .withEndAction {
+                                                recommendedTitle.animate()
+                                                    .rotation(0f)
+                                                    .setDuration(100)
+                                                    .start()
+                                            }
+                                            .start()
+                                    }
+                                    .start()
+                            }
+                            .start()
+                    }
+                    .start()
+
+                // Schedule next animation (every 3 seconds - more frequent)
+                handler.postDelayed(this, 3000)
+            }
+        }
+
+        // Start the periodic animation after a short delay
+        handler.postDelayed(animationRunnable, 1500)
     }
 
     private fun fetchRecipes() {
@@ -207,9 +277,72 @@ class HomePage : AppCompatActivity() {
         Volley.newRequestQueue(this).add(request)
     }
 
+    private fun showNavIndicator(indicatorId: Int) {
+        // Hide all indicators first with fade out
+        val indicators = listOf(
+            R.id.nav_home_indicator,
+            R.id.nav_search_indicator,
+            R.id.nav_upload_indicator,
+            R.id.nav_lib_indicator,
+            R.id.nav_profile_indicator
+        )
+
+        indicators.forEach { id ->
+            findViewById<android.view.View>(id)?.let { indicator ->
+                if (id == indicatorId) {
+                    // Fade in the active indicator
+                    indicator.visibility = android.view.View.VISIBLE
+                    indicator.alpha = 0f
+                    indicator.animate()
+                        .alpha(1f)
+                        .setDuration(300)
+                        .start()
+                } else {
+                    // Fade out inactive indicators
+                    indicator.animate()
+                        .alpha(0f)
+                        .setDuration(200)
+                        .withEndAction {
+                            indicator.visibility = android.view.View.GONE
+                        }
+                        .start()
+                }
+            }
+        }
+    }
+
+    private fun initializeFallingLeaves() {
+        val header = findViewById<android.view.View>(R.id.header)
+        val leavesContainer = findViewById<android.view.ViewGroup>(R.id.falling_leaves_container)
+
+        // Post to ensure header is measured
+        header.post {
+            val headerHeight = header.height
+            fallingLeavesAnimation = FallingLeavesAnimation(this, leavesContainer, headerHeight)
+            fallingLeavesAnimation?.start()
+        }
+    }
+
     override fun onResume() {
         super.onResume()
-
         fetchRecipes()
+
+        // Restart falling leaves animation
+        fallingLeavesAnimation?.start()
+    }
+
+    override fun onPause() {
+        super.onPause()
+
+        // Stop falling leaves animation when activity is paused
+        fallingLeavesAnimation?.stop()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+
+        // Clean up falling leaves animation
+        fallingLeavesAnimation?.stop()
+        fallingLeavesAnimation = null
     }
 }

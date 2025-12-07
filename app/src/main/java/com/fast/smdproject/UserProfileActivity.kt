@@ -87,6 +87,9 @@ class UserProfileActivity : AppCompatActivity() {
         val libBtn = findViewById<ImageButton>(R.id.lib)
         val settings = findViewById<ImageView>(R.id.ivSettings)
 
+        // Set profile indicator as active (current page)
+        showNavIndicator(R.id.nav_profile_indicator)
+
         settings.setOnClickListener {
             com.fast.smdproject.AnimationUtils.bounce(it)
             startActivity(Intent(this, SettingsActivity::class.java))
@@ -112,6 +115,40 @@ class UserProfileActivity : AppCompatActivity() {
         editBtn.setOnClickListener {
             com.fast.smdproject.AnimationUtils.bounce(it)
             startActivity(Intent(this, EditUserProfileActivity::class.java))
+        }
+    }
+
+    private fun showNavIndicator(indicatorId: Int) {
+        // Hide all indicators first with fade out
+        val indicators = listOf(
+            R.id.nav_home_indicator,
+            R.id.nav_search_indicator,
+            R.id.nav_upload_indicator,
+            R.id.nav_lib_indicator,
+            R.id.nav_profile_indicator
+        )
+
+        indicators.forEach { id ->
+            findViewById<android.view.View>(id)?.let { indicator ->
+                if (id == indicatorId) {
+                    // Fade in the active indicator
+                    indicator.visibility = android.view.View.VISIBLE
+                    indicator.alpha = 0f
+                    indicator.animate()
+                        .alpha(1f)
+                        .setDuration(300)
+                        .start()
+                } else {
+                    // Fade out inactive indicators
+                    indicator.animate()
+                        .alpha(0f)
+                        .setDuration(200)
+                        .withEndAction {
+                            indicator.visibility = android.view.View.GONE
+                        }
+                        .start()
+                }
+            }
         }
     }
 
