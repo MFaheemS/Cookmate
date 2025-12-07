@@ -1,8 +1,12 @@
 package com.fast.smdproject
 
 import android.content.Intent
+import android.graphics.Color
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.widget.Button
+import android.widget.EditText
 import android.widget.ImageButton
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -18,7 +22,11 @@ class FavoritesActivity : AppCompatActivity() {
 
     private lateinit var recyclerView: RecyclerView
     private lateinit var recipeAdapter: RecipeAdapter
+    private lateinit var searchBar: EditText
+    private lateinit var favoriteBtn: Button
+    private lateinit var downloadBtn: Button
     private val recipeList = ArrayList<Recipe>()
+    private val allRecipes = ArrayList<Recipe>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -28,7 +36,9 @@ class FavoritesActivity : AppCompatActivity() {
         val searchBtn = findViewById<ImageButton>(R.id.search)
         val btnUpload = findViewById<ImageButton>(R.id.upload)
         val profileBtn = findViewById<ImageButton>(R.id.profile)
-        val downloadBtn = findViewById<Button>(R.id.btnDownloads)
+        downloadBtn = findViewById(R.id.btnDownloads)
+        favoriteBtn = findViewById(R.id.btnFavorites)
+        searchBar = findViewById(R.id.searchDownloads)
 
         // Setup RecyclerView
         recyclerView = findViewById(R.id.downloadsRecyclerView)
@@ -37,15 +47,88 @@ class FavoritesActivity : AppCompatActivity() {
         recipeAdapter = RecipeAdapter(this, recipeList, ipAddress)
         recyclerView.adapter = recipeAdapter
 
+        // Set active state for favorites button
+        setActiveButton(favoriteBtn, true)
+        setActiveButton(downloadBtn, false)
+
+        // Setup search functionality
+        setupSearch()
+
         // Fetch liked recipes
         fetchLikedRecipes()
 
-        downloadBtn.setOnClickListener { startActivity(Intent(this, DownloadsActivity::class.java)) }
-        btnHome.setOnClickListener { startActivity(Intent(this, HomePage::class.java)) }
-        btnUpload.setOnClickListener { startActivity(Intent(this, UploadRecipe::class.java)) }
-        searchBtn.setOnClickListener { startActivity(Intent(this, SearchUserActivity::class.java)) }
+        downloadBtn.setOnClickListener {
+            AnimationUtils.buttonPressEffect(it) {
+                startActivity(Intent(this, DownloadsActivity::class.java))
+                overridePendingTransition(R.anim.activity_enter, R.anim.activity_exit)
+            }
+        }
+        btnHome.setOnClickListener {
+            AnimationUtils.bounce(it)
+            startActivity(Intent(this, HomePage::class.java))
+        }
+        btnUpload.setOnClickListener {
+            AnimationUtils.bounce(it)
+            startActivity(Intent(this, UploadRecipe::class.java))
+        }
+        searchBtn.setOnClickListener {
+            AnimationUtils.bounce(it)
+            startActivity(Intent(this, SearchUserActivity::class.java))
+        }
         profileBtn.setOnClickListener {
+            AnimationUtils.bounce(it)
             startActivity(Intent(this, UserProfileActivity::class.java))
+        }
+    }
+
+    private fun setupSearch() {
+        searchBar.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                filterRecipes(s.toString())
+            }
+
+            override fun afterTextChanged(s: Editable?) {}
+        })
+    }
+
+    private fun filterRecipes(query: String) {
+        val filteredList = if (query.isEmpty()) {
+            ArrayList(allRecipes)
+        } else {
+            allRecipes.filter { recipe ->
+                // Check if any word in title starts with the query
+                recipe.title.split(" ").any { it.startsWith(query, ignoreCase = true) } ||
+                // Check if any word in description starts with the query
+                recipe.description.split(" ").any { it.startsWith(query, ignoreCase = true) } ||
+                // Check if any tag starts with the query
+                recipe.tags.split(",", " ").any { it.trim().startsWith(query, ignoreCase = true) }
+            } as ArrayList<Recipe>
+        }
+
+        recipeList.clear()
+        recipeList.addAll(filteredList)
+        recipeAdapter.notifyDataSetChanged()
+    }
+
+    private fun setActiveButton(button: Button, isActive: Boolean) {
+        if (isActive) {
+            button.animate()
+                .scaleX(1.05f)
+                .scaleY(1.05f)
+                .setDuration(200)
+                .start()
+            button.setBackgroundResource(R.drawable.button_green_rounded)
+            button.setTextColor(Color.WHITE)
+        } else {
+            button.animate()
+                .scaleX(1f)
+                .scaleY(1f)
+                .setDuration(200)
+                .start()
+            button.setBackgroundResource(R.drawable.button_rounded_gray)
+            button.setTextColor(Color.parseColor("#666666"))
         }
     }
 
@@ -67,6 +150,7 @@ class FavoritesActivity : AppCompatActivity() {
                     if (response.getString("status") == "success") {
                         val jsonArray = response.getJSONArray("data")
                         recipeList.clear()
+                        allRecipes.clear()
 
                         for (i in 0 until jsonArray.length()) {
                             val obj = jsonArray.getJSONObject(i)
@@ -97,6 +181,7 @@ class FavoritesActivity : AppCompatActivity() {
                                 ownerId = obj.optInt("user_id", 0)
                             )
                             recipeList.add(recipe)
+                            allRecipes.add(recipe)
                         }
 
                         recipeAdapter.notifyDataSetChanged()

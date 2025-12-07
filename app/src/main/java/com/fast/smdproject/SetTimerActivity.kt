@@ -5,6 +5,7 @@ import android.app.PendingIntent
 import android.content.Intent
 import android.os.Bundle
 import android.widget.Button
+import android.widget.ImageView
 import android.widget.NumberPicker
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -20,6 +21,7 @@ class SetTimerActivity : AppCompatActivity() {
     private lateinit var minutePicker: NumberPicker
     private lateinit var amPmPicker: NumberPicker
     private lateinit var btnConfirm: Button
+    private lateinit var btnClose: ImageView
 
     private var recipeId: Int = 0
     private var recipeTitle: String = ""
@@ -39,6 +41,7 @@ class SetTimerActivity : AppCompatActivity() {
         minutePicker = findViewById(R.id.minutePicker)
         amPmPicker = findViewById(R.id.amPmPicker)
         btnConfirm = findViewById(R.id.btn_confirm_timer)
+        btnClose = findViewById(R.id.btnCloseTimer)
 
         // Setup Hour Picker (1-12)
         hourPicker.minValue = 1
@@ -65,9 +68,18 @@ class SetTimerActivity : AppCompatActivity() {
         setupPickerBehavior(minutePicker)
         setupPickerBehavior(amPmPicker)
 
+        // Close button click - cancel and go back
+        btnClose.setOnClickListener {
+            AnimationUtils.buttonPressEffect(it) {
+                finish()
+            }
+        }
+
         // Confirm button click
         btnConfirm.setOnClickListener {
-            confirmTimer()
+            com.fast.smdproject.AnimationUtils.buttonPressEffect(it) {
+                confirmTimer()
+            }
         }
     }
 

@@ -4,6 +4,7 @@ require 'db_connect.php';
 
 $query = isset($_GET['query']) ? $_GET['query'] : '';
 $categories = isset($_GET['categories']) ? $_GET['categories'] : '';
+$ingredients = isset($_GET['ingredients']) ? $_GET['ingredients'] : '';
 
 // Build SQL query dynamically
 $conditions = array();
@@ -28,6 +29,18 @@ if (!empty($categories)) {
         // Each category must be present (AND logic)
         $conditions[] = "LOWER(tags) LIKE LOWER(?)";
         $params[] = "%#" . $cleanCategory . "%";
+        $types .= 's';
+    }
+}
+
+// Add ingredient conditions if ingredients are provided (AND logic - must contain ALL ingredients)
+if (!empty($ingredients)) {
+    $ingredientArray = array_map('trim', explode(',', $ingredients));
+
+    foreach ($ingredientArray as $ingredient) {
+        // Each ingredient must be present in the ingredients field (AND logic)
+        $conditions[] = "LOWER(ingredients) LIKE LOWER(?)";
+        $params[] = "%" . $ingredient . "%";
         $types .= 's';
     }
 }

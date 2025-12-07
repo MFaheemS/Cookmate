@@ -57,11 +57,13 @@ class UserProfileActivity : AppCompatActivity() {
 
         // Click listeners for followers/following
         tvFollowersCount.setOnClickListener {
+            com.fast.smdproject.AnimationUtils.bounce(it)
             val intent = Intent(this, followers::class.java)
             startActivity(intent)
         }
 
         tvFollowingCount.setOnClickListener {
+            com.fast.smdproject.AnimationUtils.bounce(it)
             val intent = Intent(this, followings::class.java)
             startActivity(intent)
         }
@@ -86,15 +88,29 @@ class UserProfileActivity : AppCompatActivity() {
         val settings = findViewById<ImageView>(R.id.ivSettings)
 
         settings.setOnClickListener {
+            com.fast.smdproject.AnimationUtils.bounce(it)
             startActivity(Intent(this, SettingsActivity::class.java))
         }
 
-        libBtn.setOnClickListener { startActivity(Intent(this, DownloadsActivity::class.java)) }
-        btnHome.setOnClickListener { startActivity(Intent(this, HomePage::class.java)) }
-        btnUpload.setOnClickListener { startActivity(Intent(this, UploadRecipe::class.java)) }
-        searchBtn.setOnClickListener { startActivity(Intent(this, SearchUserActivity::class.java)) }
+        libBtn.setOnClickListener {
+            com.fast.smdproject.AnimationUtils.bounce(it)
+            startActivity(Intent(this, DownloadsActivity::class.java))
+        }
+        btnHome.setOnClickListener {
+            com.fast.smdproject.AnimationUtils.bounce(it)
+            startActivity(Intent(this, HomePage::class.java))
+        }
+        btnUpload.setOnClickListener {
+            com.fast.smdproject.AnimationUtils.bounce(it)
+            startActivity(Intent(this, UploadRecipe::class.java))
+        }
+        searchBtn.setOnClickListener {
+            com.fast.smdproject.AnimationUtils.bounce(it)
+            startActivity(Intent(this, SearchUserActivity::class.java))
+        }
 
         editBtn.setOnClickListener {
+            com.fast.smdproject.AnimationUtils.bounce(it)
             startActivity(Intent(this, EditUserProfileActivity::class.java))
         }
     }

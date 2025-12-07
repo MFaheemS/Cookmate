@@ -42,21 +42,30 @@ class SettingsActivity : AppCompatActivity() {
 
         // Back button
         btnBack.setOnClickListener {
-            finish()
+            com.fast.smdproject.AnimationUtils.buttonPressEffect(it) {
+                finish()
+            }
         }
 
         // Save button
         btnSave.setOnClickListener {
-            saveSettings()
+            com.fast.smdproject.AnimationUtils.buttonPressEffect(it) {
+                saveSettings()
+            }
         }
 
         // Logout button
         logOutBtn.setOnClickListener {
-            performLogout()
+            com.fast.smdproject.AnimationUtils.buttonPressEffect(it) {
+                performLogout()
+            }
         }
 
         // Handle notification dependencies
-        switchNotifications.setOnCheckedChangeListener { _, isChecked ->
+        switchNotifications.setOnCheckedChangeListener { buttonView, isChecked ->
+            // Add ripple animation
+            com.fast.smdproject.AnimationUtils.rippleToggle(buttonView, isChecked)
+
             // If all notifications disabled, also disable recipe notifications
             if (!isChecked) {
                 switchRecipeNotifications.isChecked = false
@@ -64,6 +73,19 @@ class SettingsActivity : AppCompatActivity() {
             } else {
                 switchRecipeNotifications.isEnabled = true
             }
+        }
+
+        // Add animations to other switches
+        switchPrivateProfile.setOnCheckedChangeListener { buttonView, isChecked ->
+            com.fast.smdproject.AnimationUtils.rippleToggle(buttonView, isChecked)
+        }
+
+        switchRecipeNotifications.setOnCheckedChangeListener { buttonView, isChecked ->
+            com.fast.smdproject.AnimationUtils.rippleToggle(buttonView, isChecked)
+        }
+
+        switchLogoutOnClose.setOnCheckedChangeListener { buttonView, isChecked ->
+            com.fast.smdproject.AnimationUtils.rippleToggle(buttonView, isChecked)
         }
     }
 

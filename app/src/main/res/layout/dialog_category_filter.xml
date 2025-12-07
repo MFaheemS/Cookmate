@@ -1,38 +1,111 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:padding="24dp">
+    android:padding="24dp"
+    android:background="#AED581">
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Filter by Categories"
-        android:textColor="#000000"
+        android:text="Filter Recipes"
+        android:textColor="#FFFFFF"
         android:textSize="18sp"
         android:textStyle="bold"
         android:layout_marginBottom="16dp" />
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Enter categories (e.g., #lunch, #spicy, #veg)"
-        android:textColor="#666666"
-        android:textSize="13sp"
-        android:layout_marginBottom="12dp" />
-
-    <EditText
-        android:id="@+id/filter_input"
+    <!-- Toggle Buttons for Categories/Ingredients -->
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Example: #dessert, #sweet"
-        android:inputType="text"
-        android:textColor="#333333"
-        android:textColorHint="#999999"
-        android:padding="12dp"
-        android:background="@drawable/emailinput"
-        android:minHeight="48dp" />
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:layout_marginBottom="16dp">
+
+        <Button
+            android:id="@+id/btn_categories_tab"
+            android:layout_width="0dp"
+            android:layout_height="40dp"
+            android:layout_weight="1"
+            android:text="Categories"
+            android:textColor="#FFFFFF"
+            android:background="@drawable/button_green_rounded"
+            android:textAllCaps="false"
+            app:backgroundTint="@null"
+            android:layout_marginEnd="8dp"/>
+
+        <Button
+            android:id="@+id/btn_ingredients_tab"
+            android:layout_width="0dp"
+            android:layout_height="40dp"
+            android:layout_weight="1"
+            android:text="Ingredients"
+            android:textColor="#666666"
+            android:background="@drawable/button_rounded_gray"
+            android:textAllCaps="false"
+            app:backgroundTint="@null"
+            android:layout_marginStart="8dp"/>
+    </LinearLayout>
+
+    <!-- Categories Section -->
+    <LinearLayout
+        android:id="@+id/categories_section"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:visibility="visible">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Enter categories (e.g., #lunch, #spicy, #veg)"
+            android:textColor="#FFFFFF"
+            android:textSize="13sp"
+            android:layout_marginBottom="12dp" />
+
+        <EditText
+            android:id="@+id/filter_input_categories"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Example: #dessert, #sweet"
+            android:inputType="text"
+            android:textColor="#000000"
+            android:textColorHint="#666666"
+            android:padding="12dp"
+            android:background="@drawable/emailinput"
+            android:minHeight="48dp" />
+    </LinearLayout>
+
+    <!-- Ingredients Section -->
+    <LinearLayout
+        android:id="@+id/ingredients_section"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:visibility="gone">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Enter ingredients (e.g., egg, flour, sugar)"
+            android:textColor="#FFFFFF"
+            android:textSize="13sp"
+            android:layout_marginBottom="12dp" />
+
+        <EditText
+            android:id="@+id/filter_input_ingredients"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Example: chicken, tomato, cheese"
+            android:inputType="text"
+            android:textColor="#000000"
+            android:textColorHint="#666666"
+            android:padding="12dp"
+            android:background="@drawable/emailinput"
+            android:minHeight="48dp" />
+    </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -46,7 +119,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Clear"
-            android:textColor="#666666"
+            android:textColor="#FFFFFF"
             android:background="@android:color/transparent"
             android:textAllCaps="false"
             android:paddingStart="16dp"
@@ -55,14 +128,15 @@
         <Button
             android:id="@+id/btn_apply"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="40dp"
             android:text="Apply Filter"
             android:textColor="#FFFFFF"
-            android:background="@drawable/backgroundbutton"
+            android:background="@drawable/button_green_rounded"
             android:textAllCaps="false"
             android:paddingStart="24dp"
             android:paddingEnd="24dp"
-            android:layout_marginStart="8dp" />
+            android:layout_marginStart="8dp"
+            app:backgroundTint="@null" />
     </LinearLayout>
 
 </LinearLayout>

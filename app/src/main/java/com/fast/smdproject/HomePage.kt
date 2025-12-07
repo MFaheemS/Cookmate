@@ -38,14 +38,27 @@ class HomePage : AppCompatActivity() {
         val profileBtn = findViewById<ImageView>(R.id.profile)
 
         searchBar.setOnClickListener {
+            com.fast.smdproject.AnimationUtils.bounce(it)
             val intent = Intent(this, SearchRecipeActivity::class.java)
             startActivity(intent)
         }
 
-        btnSearch.setOnClickListener { startActivity(Intent(this, SearchUserActivity::class.java)) }
-        btnUpload.setOnClickListener { startActivity(Intent(this, UploadRecipe::class.java)) }
-        libBtn.setOnClickListener { startActivity(Intent(this, DownloadsActivity::class.java)) }
-        profileBtn.setOnClickListener { startActivity(Intent(this, UserProfileActivity::class.java)) }
+        btnSearch.setOnClickListener {
+            com.fast.smdproject.AnimationUtils.bounce(it)
+            startActivity(Intent(this, SearchUserActivity::class.java))
+        }
+        btnUpload.setOnClickListener {
+            com.fast.smdproject.AnimationUtils.bounce(it)
+            startActivity(Intent(this, UploadRecipe::class.java))
+        }
+        libBtn.setOnClickListener {
+            com.fast.smdproject.AnimationUtils.bounce(it)
+            startActivity(Intent(this, DownloadsActivity::class.java))
+        }
+        profileBtn.setOnClickListener {
+            com.fast.smdproject.AnimationUtils.bounce(it)
+            startActivity(Intent(this, UserProfileActivity::class.java))
+        }
 
         // RecyclerView Setup
         recyclerView = findViewById(R.id.recycler_view_recipes)

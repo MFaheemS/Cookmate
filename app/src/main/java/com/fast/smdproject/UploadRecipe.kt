@@ -71,22 +71,32 @@ class UploadRecipe : AppCompatActivity() {
         setupImageRecyclerView()
 
         // Listeners
-        btnBack.setOnClickListener { finish() }
+        btnBack.setOnClickListener {
+            com.fast.smdproject.AnimationUtils.buttonPressEffect(it) {
+                finish()
+            }
+        }
 
         btnAddImage.setOnClickListener {
-            if (selectedImages.size < 5) {
-                pickImageLauncher.launch("image/*")
-            } else {
-                Toast.makeText(this, "Maximum 5 images allowed", Toast.LENGTH_SHORT).show()
+            com.fast.smdproject.AnimationUtils.buttonPressEffect(it) {
+                if (selectedImages.size < 5) {
+                    pickImageLauncher.launch("image/*")
+                } else {
+                    Toast.makeText(this, "Maximum 5 images allowed", Toast.LENGTH_SHORT).show()
+                }
             }
         }
 
         btnAddIngredient.setOnClickListener {
-            addIngredientRow()
+            com.fast.smdproject.AnimationUtils.buttonPressEffect(it) {
+                addIngredientRow()
+            }
         }
 
         btnUpload.setOnClickListener {
-            uploadRecipeToBackend()
+            com.fast.smdproject.AnimationUtils.buttonPressEffect(it) {
+                uploadRecipeToBackend()
+            }
         }
     }
 
@@ -102,6 +112,9 @@ class UploadRecipe : AppCompatActivity() {
     private fun addIngredientRow() {
         val view = layoutInflater.inflate(R.layout.item_ingredient_row, null)
         ingredientsContainer.addView(view)
+
+        // Add pop-in animation
+        com.fast.smdproject.AnimationUtils.popIn(view, 0)
     }
 
     private fun uploadRecipeToBackend() {
