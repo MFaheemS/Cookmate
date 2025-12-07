@@ -481,6 +481,9 @@ class RecipeDetail : AppCompatActivity() {
         val isCurrentlyLiked = iconLike.drawable.constantState ==
             resources.getDrawable(R.drawable.ic_like_fill, null)?.constantState
 
+        // Add bounce animation
+        com.fast.smdproject.AnimationUtils.bounce(iconLike)
+
         // Update UI optimistically (immediately)
         iconLike.setImageResource(
             if (isCurrentlyLiked) R.drawable.ic_like else R.drawable.ic_like_fill
@@ -593,6 +596,9 @@ class RecipeDetail : AppCompatActivity() {
             resources.getDrawable(R.drawable.ic_downloaded, null)?.constantState
 
         val db = UserDatabase(this)
+
+        // Add bounce animation
+        com.fast.smdproject.AnimationUtils.bounce(iconDownload)
 
         // Update UI optimistically (immediately)
         iconDownload.setImageResource(

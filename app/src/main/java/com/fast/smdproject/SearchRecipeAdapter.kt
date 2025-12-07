@@ -39,6 +39,9 @@ class SearchRecipeAdapter(
 
         holder.txtTitle.text = recipe.title
 
+        // Add slide-up fade-in animation with stagger
+        com.fast.smdproject.AnimationUtils.slideUpFadeIn(holder.itemView, position * 30L)
+
         // Parse categories from tags (format: #lunch, #spicy)
         val categories = recipe.tags
             .split(",")
@@ -72,11 +75,17 @@ class SearchRecipeAdapter(
             holder.imgRecipe.setImageResource(R.drawable.logo2)
         }
 
-        // Click to open recipe detail
+        // Click to open recipe detail with scale animation
         holder.itemView.setOnClickListener {
-            val intent = Intent(context, RecipeDetail::class.java)
-            intent.putExtra("RECIPE_ID", recipe.recipeId)
-            context.startActivity(intent)
+            com.fast.smdproject.AnimationUtils.buttonPressEffect(it) {
+                val intent = Intent(context, RecipeDetail::class.java)
+                intent.putExtra("RECIPE_ID", recipe.recipeId)
+                context.startActivity(intent)
+                (context as? android.app.Activity)?.overridePendingTransition(
+                    R.anim.activity_enter,
+                    R.anim.activity_exit
+                )
+            }
         }
     }
 

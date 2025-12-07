@@ -223,18 +223,34 @@ class SearchRecipeActivity : AppCompatActivity() {
 
         filterChipsContainer.visibility = View.VISIBLE
 
-        currentCategories.forEach { category ->
+        currentCategories.forEachIndexed { index, category ->
             val chipView = LayoutInflater.from(this).inflate(R.layout.item_category_chip, filterChipsLayout, false)
             val chipText = chipView.findViewById<TextView>(R.id.chip_text)
             val chipClose = chipView.findViewById<ImageView>(R.id.chip_close)
 
             chipText.text = "#$category"
 
+            // Add pop-in animation with stagger
+            com.fast.smdproject.AnimationUtils.popIn(chipView, index * 50L)
+
             chipClose.setOnClickListener {
-                removeCategory(category)
+                com.fast.smdproject.AnimationUtils.buttonPressEffect(it) {
+                    removeCategoryWithAnimation(category, chipView)
+                }
             }
 
             filterChipsLayout.addView(chipView)
+        }
+    }
+
+    private fun removeCategoryWithAnimation(category: String, chipView: View) {
+        com.fast.smdproject.AnimationUtils.popOut(chipView) {
+            currentCategories.remove(category)
+            performSearchWithFilters()
+
+            if (currentCategories.isEmpty()) {
+                filterChipsContainer.visibility = View.GONE
+            }
         }
     }
 

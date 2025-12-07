@@ -55,6 +55,9 @@ class RecipeAdapter(
         holder.txtLikeCount.text = recipe.likeCount.toString()
         holder.txtDownloadCount.text = recipe.downloadCount.toString()
 
+        // Add slide-up fade-in animation with stagger
+        com.fast.smdproject.AnimationUtils.slideUpFadeIn(holder.itemView, position * 30L)
+
         // Set initial icon states
         updateLikeIcon(holder.iconLike, recipe.isLiked)
         updateDownloadIcon(holder.iconDownload, recipe.isDownloaded)
@@ -80,28 +83,38 @@ class RecipeAdapter(
             .error(R.drawable.logo2)
             .into(holder.imgRecipe)
 
-        // Like button click - disabled for own recipes
+        // Like button click with animation - disabled for own recipes
         holder.iconLike.setOnClickListener {
             if (!isOwnRecipe) {
+                com.fast.smdproject.AnimationUtils.bounce(it)
                 toggleLike(recipe, holder)
             } else {
+                com.fast.smdproject.AnimationUtils.shake(it)
                 Toast.makeText(context, "You cannot like your own recipe", Toast.LENGTH_SHORT).show()
             }
         }
 
-        // Download button click - disabled for own recipes
+        // Download button click with animation - disabled for own recipes
         holder.iconDownload.setOnClickListener {
             if (!isOwnRecipe) {
+                com.fast.smdproject.AnimationUtils.bounce(it)
                 toggleDownload(recipe, holder)
             } else {
+                com.fast.smdproject.AnimationUtils.shake(it)
                 Toast.makeText(context, "You cannot download your own recipe", Toast.LENGTH_SHORT).show()
             }
         }
 
         holder.btnDetails.setOnClickListener {
-            val intent = Intent(context, RecipeDetail::class.java)
-            intent.putExtra("RECIPE_ID", recipe.recipeId)
-            context.startActivity(intent)
+            com.fast.smdproject.AnimationUtils.buttonPressEffect(it) {
+                val intent = Intent(context, RecipeDetail::class.java)
+                intent.putExtra("RECIPE_ID", recipe.recipeId)
+                context.startActivity(intent)
+                (context as? android.app.Activity)?.overridePendingTransition(
+                    R.anim.activity_enter,
+                    R.anim.activity_exit
+                )
+            }
         }
 
         holder.itemView.setOnClickListener(null)

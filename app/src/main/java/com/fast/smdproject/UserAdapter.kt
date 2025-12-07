@@ -35,6 +35,9 @@ class UserAdapter(
         holder.userName.text = "@${user.username}"
         holder.userFullName.text = "${user.firstName} ${user.lastName}"
 
+        // Add slide-up fade-in animation with stagger
+        com.fast.smdproject.AnimationUtils.slideUpFadeIn(holder.itemView, position * 30L)
+
         // Load profile image if available
         if (!user.profileImage.isNullOrEmpty()) {
             val imageUrl = "http://$ipAddress/cookMate/${user.profileImage}"
@@ -47,12 +50,18 @@ class UserAdapter(
             holder.userAvatar.setImageResource(R.drawable.default_avatar)
         }
 
-        // Click on entire item or button to view profile
-        val clickListener = View.OnClickListener {
-            val intent = Intent(context, SecondUserProfileActivity::class.java)
-            intent.putExtra("user_id", user.userId)
-            intent.putExtra("username", user.username)
-            context.startActivity(intent)
+        // Click on entire item or button to view profile with animations
+        val clickListener = View.OnClickListener { view ->
+            com.fast.smdproject.AnimationUtils.buttonPressEffect(view) {
+                val intent = Intent(context, SecondUserProfileActivity::class.java)
+                intent.putExtra("user_id", user.userId)
+                intent.putExtra("username", user.username)
+                context.startActivity(intent)
+                (context as? android.app.Activity)?.overridePendingTransition(
+                    R.anim.activity_enter,
+                    R.anim.activity_exit
+                )
+            }
         }
 
         holder.itemView.setOnClickListener(clickListener)
