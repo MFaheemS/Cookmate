@@ -155,8 +155,8 @@ class RecipeDetail : AppCompatActivity() {
             steps = data.getString("steps"),
             tags = data.getString("tags"),
             images = data.getString("images"),
-            likeCount = data.getInt("favorites_count"),
-            downloadCount = data.getInt("downloads_count"),
+            likeCount = data.optInt("favorites_count", data.optInt("like_count", 0)),
+            downloadCount = data.optInt("downloads_count", data.optInt("download_count", 0)),
             isLiked = data.optBoolean("is_liked", false),
             isDownloaded = data.optBoolean("is_downloaded", false),
             ownerId = data.optInt("user_id", 0),
@@ -504,6 +504,29 @@ class RecipeDetail : AppCompatActivity() {
                 try {
                     val json = JSONObject(response)
                     if (json.getString("status") == "success") {
+                        // Update the cached recipe details with new counts and state
+                        val db = UserDatabase(this)
+                        val cachedRecipe = db.getRecipeDetail(currentRecipeId)
+                        if (cachedRecipe != null) {
+                            // Update the cached data with new values
+                            db.saveRecipeDetail(
+                                recipeId = currentRecipeId,
+                                title = cachedRecipe["title"] ?: "",
+                                description = cachedRecipe["description"] ?: "",
+                                ingredients = cachedRecipe["ingredients"] ?: "",
+                                steps = cachedRecipe["steps"] ?: "",
+                                tags = cachedRecipe["tags"] ?: "",
+                                images = cachedRecipe["images"] ?: "",
+                                likeCount = json.optInt("like_count", newCount),
+                                downloadCount = cachedRecipe["download_count"]?.toIntOrNull() ?: 0,
+                                isLiked = !isCurrentlyLiked,
+                                isDownloaded = cachedRecipe["is_downloaded"] == "1",
+                                ownerId = cachedRecipe["owner_id"]?.toIntOrNull() ?: 0,
+                                ownerUsername = cachedRecipe["owner_username"] ?: "",
+                                ownerProfileImage = cachedRecipe["owner_profile_image"] ?: ""
+                            )
+                        }
+
                         val message = if (isCurrentlyLiked) "Removed from favorites" else "Added to favorites"
                         Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
                     } else {
@@ -528,6 +551,27 @@ class RecipeDetail : AppCompatActivity() {
                 val db = UserDatabase(this)
                 val actionType = if (isCurrentlyLiked) "unlike" else "like"
                 db.queueAction(currentUserId, actionType, currentRecipeId, "recipe")
+
+                // Update cached recipe with optimistic state
+                val cachedRecipe = db.getRecipeDetail(currentRecipeId)
+                if (cachedRecipe != null) {
+                    db.saveRecipeDetail(
+                        recipeId = currentRecipeId,
+                        title = cachedRecipe["title"] ?: "",
+                        description = cachedRecipe["description"] ?: "",
+                        ingredients = cachedRecipe["ingredients"] ?: "",
+                        steps = cachedRecipe["steps"] ?: "",
+                        tags = cachedRecipe["tags"] ?: "",
+                        images = cachedRecipe["images"] ?: "",
+                        likeCount = newCount,
+                        downloadCount = cachedRecipe["download_count"]?.toIntOrNull() ?: 0,
+                        isLiked = !isCurrentlyLiked,
+                        isDownloaded = cachedRecipe["is_downloaded"] == "1",
+                        ownerId = cachedRecipe["owner_id"]?.toIntOrNull() ?: 0,
+                        ownerUsername = cachedRecipe["owner_username"] ?: "",
+                        ownerProfileImage = cachedRecipe["owner_profile_image"] ?: ""
+                    )
+                }
 
                 Toast.makeText(this, "Action queued - will sync when online", Toast.LENGTH_SHORT).show()
             }
@@ -564,7 +608,7 @@ class RecipeDetail : AppCompatActivity() {
             fetchAndSaveRecipeToLocal(currentRecipeId)
         } else {
             db.deleteDownloadedRecipe(currentRecipeId, currentUserId)
-            db.deleteRecipeDetail(currentRecipeId)
+            // Don't delete recipe detail cache, just update the download state
         }
 
         val ipAddress = getString(R.string.ipAddress)
@@ -581,6 +625,27 @@ class RecipeDetail : AppCompatActivity() {
                 try {
                     val json = JSONObject(response)
                     if (json.getString("status") == "success") {
+                        // Update the cached recipe details with new counts and state
+                        val cachedRecipe = db.getRecipeDetail(currentRecipeId)
+                        if (cachedRecipe != null) {
+                            db.saveRecipeDetail(
+                                recipeId = currentRecipeId,
+                                title = cachedRecipe["title"] ?: "",
+                                description = cachedRecipe["description"] ?: "",
+                                ingredients = cachedRecipe["ingredients"] ?: "",
+                                steps = cachedRecipe["steps"] ?: "",
+                                tags = cachedRecipe["tags"] ?: "",
+                                images = cachedRecipe["images"] ?: "",
+                                likeCount = cachedRecipe["like_count"]?.toIntOrNull() ?: 0,
+                                downloadCount = json.optInt("download_count", newCount),
+                                isLiked = cachedRecipe["is_liked"] == "1",
+                                isDownloaded = !isCurrentlyDownloaded,
+                                ownerId = cachedRecipe["owner_id"]?.toIntOrNull() ?: 0,
+                                ownerUsername = cachedRecipe["owner_username"] ?: "",
+                                ownerProfileImage = cachedRecipe["owner_profile_image"] ?: ""
+                            )
+                        }
+
                         val message = if (isCurrentlyDownloaded) "Removed from downloads" else "Added to downloads"
                         Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
                     } else {
@@ -604,6 +669,27 @@ class RecipeDetail : AppCompatActivity() {
                 // Queue action for later if network fails
                 val actionType = if (isCurrentlyDownloaded) "undownload" else "download"
                 db.queueAction(currentUserId, actionType, currentRecipeId, "recipe")
+
+                // Update cached recipe with optimistic state
+                val cachedRecipe = db.getRecipeDetail(currentRecipeId)
+                if (cachedRecipe != null) {
+                    db.saveRecipeDetail(
+                        recipeId = currentRecipeId,
+                        title = cachedRecipe["title"] ?: "",
+                        description = cachedRecipe["description"] ?: "",
+                        ingredients = cachedRecipe["ingredients"] ?: "",
+                        steps = cachedRecipe["steps"] ?: "",
+                        tags = cachedRecipe["tags"] ?: "",
+                        images = cachedRecipe["images"] ?: "",
+                        likeCount = cachedRecipe["like_count"]?.toIntOrNull() ?: 0,
+                        downloadCount = newCount,
+                        isLiked = cachedRecipe["is_liked"] == "1",
+                        isDownloaded = !isCurrentlyDownloaded,
+                        ownerId = cachedRecipe["owner_id"]?.toIntOrNull() ?: 0,
+                        ownerUsername = cachedRecipe["owner_username"] ?: "",
+                        ownerProfileImage = cachedRecipe["owner_profile_image"] ?: ""
+                    )
+                }
 
                 Toast.makeText(this, "Action queued - will sync when online", Toast.LENGTH_SHORT).show()
             }
