@@ -2,7 +2,7 @@
 
 CookMate is a full-stack social recipe platform with an Android app frontend and a PHP + MySQL backend. It supports recipe sharing, social engagement, reminders, notifications, and profile management in one product-style implementation.
 
-## Recruiter-Friendly Highlights
+## Highlights
 
 - Built a full-stack Android recipe platform using an Android client, PHP APIs, and MySQL persistence.
 - Implemented end-to-end user flows: signup/login, profile management, recipe publishing, and personalized content retrieval.
@@ -124,6 +124,4 @@ Representative backend files:
 - Root Gradle files - Android build configuration
 - Root SQL/PHP files - additional schema/legacy endpoint artifacts
 
-## Notes for Recruiters and Interviewers
 
-CookMate reflects practical experience building a product-oriented mobile platform that combines client engineering, backend API development, relational database design, and engagement-centric feature implementation.
